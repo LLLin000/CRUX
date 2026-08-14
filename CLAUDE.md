@@ -7,6 +7,7 @@
   3. 确认行为靠"读文档+读源码"，试错最多 1-2 次，仍不通就回到文档
 - 第三方库的配置/API 一律以官方 cookbook 结构为准（例：RF-DETR 训练用 Python API `RFDETRSegSmall + SegmentationTrainConfig + build_trainer`，不用 CLI 扁平参数）
 - 产出脚本必须带 `--selfcheck` 自检
+- **iOS 版本纪律**：deployment target = iOS 17.0。任何 iOS 18+ 的 API（如 `MKMapItem.identifier`）必须包 `#available(iOS 18, *)` 检查并提供降级路径，否则低版本编译失败
 
 ## Structure
 - `PLAN.md` — 方案 v1.2.1（冻结的 spec，单一事实来源）
