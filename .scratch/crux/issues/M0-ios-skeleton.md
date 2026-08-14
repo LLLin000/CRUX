@@ -5,9 +5,12 @@
 - **Target**: 底部 2 主入口（今日|图鉴）+ 独立 ＋；SwiftData schema v1；设计 token；状态驱动导航
 
 ## Acceptance
-- [ ] schema v1 编译通过（ClimbRoute/Hold/RouteUnionMask，含 maskRLE/maskWidth/maskHeight/provenance 字段）
-- [ ] 2 主 tab 可切；Add flow 可开可关；二级导航（设置）完整返回
-- [ ] 设计 token（Theme）与 prototype 对齐（#0B0C0E / #C9FF45 / route colors）
+- [x] schema v1 编译通过（ClimbRoute/Hold/RouteUnionMask，含 maskRLE/maskWidth/maskHeight/provenance 字段）
+- [x] 2 主 tab 可切；Add flow 可开可关；二级导航（设置）完整返回
+- [x] 设计 token（Theme）与 prototype 对齐（#0B0C0E / #C9FF45 / route colors）
+
+## 状态
+- **完成**：Codemagic iOS 模拟器构建通过，5 个单元测试全绿（2026-08）
 
 ## 依赖
 - 无（M0 不依赖 D 轨）
