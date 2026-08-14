@@ -120,7 +120,11 @@ def main(photo: Path, model_path: Path, seed_lab: np.ndarray, out_dir: Path) -> 
         cv2.circle(route, (int(x), int(y)), 6, (60, 120, 255), -1)
     cv2.imwrite(str(out_dir / "3_route_line.jpg"), cv2.cvtColor(route, cv2.COLOR_RGB2BGR))
 
-    print(f"wrote {out_dir}/1_highlight.jpg, 2_badge.jpg, 3_route_line.jpg")
+    # ---------- rendering 4: circular badge logo (holds extracted) ----------
+    logo = badge_logo(img_rgb, holds, matched_ids, label=args.label)
+    cv2.imwrite(str(out_dir / "4_badge_logo.png"), cv2.cvtColor(logo, cv2.COLOR_RGB2BGR))
+
+    print(f"wrote {out_dir}/1_highlight.jpg, 2_badge.jpg, 3_route_line.jpg, 4_badge_logo.png")
 
 
 def outline(img: np.ndarray, hold: Hold, color, thickness: int) -> None:
@@ -185,6 +189,96 @@ def cartoon(img_rgb: np.ndarray, holds: list[Hold], matched_ids: list[int]) -> n
     return out
 
 
+def badge_logo(img_rgb: np.ndarray, holds: list[Hold], matched_ids: list[int],
+               size: int = 1200, label: str = "CRUX") -> np.ndarray:
+    """Extract matched holds into a standalone circular badge logo.
+
+    - navy radial-gradient disc + white ring (classic mark look)
+    - holds keep their REAL colors, warped into the disc preserving the
+      route's aspect ratio (no per-hold distortion), white polyline outlines
+    - optional label centered under the route
+    """
+    mh = [next(h for h in holds if h.id == hid) for hid in matched_ids]
+    if not mh:
+        return np.full((size, size, 3), 20, np.uint8)
+
+    # route bbox in photo space
+    xs0, ys0 = np.inf, np.inf
+    xs1, ys1 = -np.inf, -np.inf
+    for h in mh:
+        ys, xs = np.nonzero(h.mask)
+        xs0, ys0 = min(xs0, xs.min()), min(ys0, ys.min())
+        xs1, ys1 = max(xs1, xs.max()), max(ys1, ys.max())
+    rw, rh = xs1 - xs0, ys1 - ys0
+    pad = 0.08 * max(rw, rh)
+    rw, rh = rw + 2 * pad, rh + 2 * pad
+
+    # fit into disc interior (keep aspect ratio), slight upward bias for label
+    inner = size * 0.78
+    scale = min(inner / rw, inner / rh)
+    dw, dh = rw * scale, rh * scale
+    ox = (size - dw) / 2
+    oy = (size - dh) / 2 - size * 0.04
+
+    # --- disc backdrop ---
+    yy, xx = np.mgrid[0:size, 0:size]
+    c = np.sqrt(((xx - size / 2) / (size / 2)) ** 2 + ((yy - size / 2) / (size / 2)) ** 2)
+    grad = (np.array([56, 74, 102])[None, None] * (1 - c[..., None]) +
+            np.array([14, 20, 33])[None, None] * c[..., None])
+    disc = grad.astype(np.uint8)
+    # white ring
+    ring = (c > 0.955) & (c < 0.995)
+    disc[ring] = (240, 240, 240)
+    # feather the disc edge
+    disc[c > 0.995] = 0  # outside -> black (transparency handled at crop)
+
+    # --- route line connecting holds (bottom-up order, drawn first) ---
+    order = sorted(mh, key=lambda h: h.centroid[1])
+    line_pts = []
+    for h in order:
+        ys, xs = np.nonzero(h.mask)
+        cx = ox + (xs.mean() - xs0) * scale
+        cy = oy + (ys.mean() - ys0) * scale
+        line_pts.append((int(cx), int(cy)))
+    for a, b in zip(line_pts[:-1], line_pts[1:]):
+        cv2.line(disc, a, b, (230, 230, 235), max(2, size // 400), cv2.LINE_AA)
+
+    # --- warp each hold mask+color into disc coords ---
+    for h in mh:
+        ys, xs = np.nonzero(h.mask)
+        # map photo (x, y) -> disc (X, Y)
+        X = ox + (xs.astype(np.float64) - xs0) * scale
+        Y = oy + (ys.astype(np.float64) - ys0) * scale
+        Xi, Yi = X.astype(np.int32), Y.astype(np.int32)
+        keep = (Xi >= 0) & (Xi < size) & (Yi >= 0) & (Yi < size)
+        Xi, Yi = Xi[keep], Yi[keep]
+        col = img_rgb[ys[keep], xs[keep]]
+        disc[Yi, Xi] = col  # nearest-neighbor warp (fine at this scale)
+        outline_at(disc, Xi, Yi, (255, 255, 255), 3)
+
+    # --- label ---
+    if label:
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        fs = size / 16
+        thick = max(3, size // 150)
+        (tw, th), base = cv2.getTextSize(label, font, fs, thick)
+        tx = (size - tw) // 2
+        ty = size - int(size * 0.075)
+        # subtle shadow for legibility on the dark disc
+        cv2.putText(disc, label, (tx + 2, ty + 2), font, fs, (10, 15, 25), thick, cv2.LINE_AA)
+        cv2.putText(disc, label, (tx, ty), font, fs, (240, 240, 240), thick, cv2.LINE_AA)
+
+    return disc
+
+
+def outline_at(img: np.ndarray, xs: np.ndarray, ys: np.ndarray, color, thickness: int) -> None:
+    """White outline for a warped hold: paint pixels near the boundary."""
+    m = np.zeros(img.shape[:2], np.uint8)
+    m[ys, xs] = 255
+    edge = m - cv2.erode(m, np.ones((2 * thickness + 1, 2 * thickness + 1), np.uint8))
+    img[edge > 0] = color
+
+
 def route_order(holds: list[Hold], matched_ids: list[int]) -> list[int]:
     """Order matched holds by y (routes run bottom-up; y grows downward)."""
     return sorted(matched_ids, key=lambda hid: holds[hid].centroid[1])
@@ -198,6 +292,7 @@ if __name__ == "__main__":
                     default=Path("output/onnx_640_aug/rfdetr-seg-small-aug.onnx"))
     ap.add_argument("--seed-lab", type=str, default="35 5 -25", help="target Lab 'L a b'")
     ap.add_argument("--out", type=Path, default=Path("data/route_viz"))
+    ap.add_argument("--label", type=str, default="CRUX", help="badge logo text ('' to skip)")
     args = ap.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     lab = np.array([float(x) for x in args.seed_lab.split()])
