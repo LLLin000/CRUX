@@ -1,6 +1,9 @@
 // Add-record flow — camera/gallery -> form -> save (PLAN M1; gym via MKLocalSearch)
 // Camera = wrapped UIImagePickerController; gallery = PhotosPicker (no permission).
+// Entire file is iOS-only (UIKit): guarded so the CRUXCore test chain can
+// build the CRUX target on macOS for `swift test` (full-package build).
 
+#if os(iOS)
 import SwiftUI
 import SwiftData
 import PhotosUI
@@ -250,3 +253,4 @@ struct GymSearchView: View {
         }
     }
 }
+#endif  // os(iOS)

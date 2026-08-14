@@ -42,7 +42,7 @@ struct RoutesView: View {
             .background(Theme.bg)
             .navigationTitle("路线图鉴")
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .primaryAction) {  // topBarTrailing on iOS, primaryAction on macOS
                     Menu {
                         ForEach(RouteFilter.allCases) { f in
                             Button(f.rawValue) { filter = f }

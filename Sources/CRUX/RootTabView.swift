@@ -33,9 +33,15 @@ struct RootTabView: View {
         .tint(Theme.accent)
         .preferredColorScheme(.dark)
         .overlay(alignment: .bottom) { AddButton { router.showAdd = true } }
+#if os(iOS)
         .fullScreenCover(item: $router.sheet) { _ in
             AddRecordFlow()
         }
+#else
+        .sheet(item: $router.sheet) { _ in
+            EmptyView()  // AddRecordFlow is iOS-only (UIKit); macOS CI builds don't use it
+        }
+#endif
     }
 }
 

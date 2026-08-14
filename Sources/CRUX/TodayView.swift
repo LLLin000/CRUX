@@ -23,7 +23,7 @@ struct TodayView: View {
             .background(Theme.bg)
             .navigationTitle("今日")
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .navigation) {  // .navigation = topBarLeading on iOS, works on macOS too
                     Button { /* settings — secondary entry (PLAN D2) */ } label: {
                         Image(systemName: "gearshape").foregroundStyle(Theme.text)
                     }
