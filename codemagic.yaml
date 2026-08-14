@@ -21,7 +21,15 @@ workflows:
           # Build ONLY the test dependency chain (CRUXCore + tests) so the
           # iOS-only CRUX UI target (SwiftUI/UIKit) is not compiled on macOS.
           swift build --target CRUXCoreTests
-          swift test --skip-build
+          # swift test --skip-build expects the package-level discovery bundle
+          # (CRUXPackageTests.xctest) which --target does not produce; run the
+          # built CRUXCoreTests bundle directly instead.
+          TEST_BUNDLE=$(find .build -name 'CRUXCoreTests.xctest' -maxdepth 4 | head -1)
+          if [ -n "$TEST_BUNDLE" ]; then
+            "$TEST_BUNDLE/Contents/MacOS/CRUXCoreTests"
+          else
+            .build/arm64-apple-macosx/debug/CRUXCoreTests
+          fi
     artifacts:
       - .build/**/*.log
     publishing:

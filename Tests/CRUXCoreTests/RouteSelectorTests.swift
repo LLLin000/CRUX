@@ -57,7 +57,6 @@ final class RouteSelectorTests: XCTestCase {
 
     func testMedianLabOfKnownColor() {
         // A uniform blue block must produce its exact Lab median.
-        let img: [Int: (r: Double, g: Double, b: Double)] = [:]
         let holds = [HoldGeometry(bboxX: 0, bboxY: 0, bboxWidth: 1, bboxHeight: 1,
                                   maskWidth: 1, maskHeight: 1, maskRLE: Data([Int32(0), Int32(1)].withUnsafeBytes { Data($0) }))]
         let labs = SeededRouteSelector.medianLabPerHold(
