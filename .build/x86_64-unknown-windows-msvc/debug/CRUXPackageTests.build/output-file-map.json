@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\primary.swiftdeps"
+  },
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.derived\\runner.swift": {
+    "dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\runner.d",
+    "object": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\runner.swift.o",
+    "swiftmodule": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\runner~partial.swiftmodule",
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\runner.swiftdeps",
+    "diagnostics": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\runner.dia"
+  }
+}

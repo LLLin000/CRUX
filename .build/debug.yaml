@@ -1,0 +1,193 @@
+client:
+  name: basic
+  file-system: device-agnostic
+tools: {}
+targets:
+  "CRUX-x86_64-unknown-windows-msvc-debug.module": ["<CRUX-x86_64-unknown-windows-msvc-debug.module>"]
+  "CRUXCore-x86_64-unknown-windows-msvc-debug.module": ["<CRUXCore-x86_64-unknown-windows-msvc-debug.module>"]
+  "CRUXCoreTests-x86_64-unknown-windows-msvc-debug.module": ["<CRUXCoreTests-x86_64-unknown-windows-msvc-debug.module>"]
+  "CRUXPackageDiscoveredTests-x86_64-unknown-windows-msvc-debug.module": ["<CRUXPackageDiscoveredTests-x86_64-unknown-windows-msvc-debug.module>"]
+  "CRUXPackageTests-x86_64-unknown-windows-msvc-debug.module": ["<CRUXPackageTests-x86_64-unknown-windows-msvc-debug.module>"]
+  "CRUXPackageTests-x86_64-unknown-windows-msvc-debug.test": ["<CRUXPackageTests-x86_64-unknown-windows-msvc-debug.test>"]
+  "PackageStructure": ["<PackageStructure>"]
+  "main": ["<CRUX-x86_64-unknown-windows-msvc-debug.module>","<CRUXCore-x86_64-unknown-windows-msvc-debug.module>"]
+  "test": ["<CRUX-x86_64-unknown-windows-msvc-debug.module>","<CRUXCore-x86_64-unknown-windows-msvc-debug.module>","<CRUXCoreTests-x86_64-unknown-windows-msvc-debug.module>","<CRUXPackageTests-x86_64-unknown-windows-msvc-debug.test>"]
+default: "main"
+nodes:
+  "D:\\L\\AI\\CRUX\\Sources\\CRUX/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "D:\\L\\AI\\CRUX\\Sources\\CRUXCore/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+  "D:\\L\\AI\\CRUX\\Tests\\CRUXCoreTests/":
+    is-directory-structure: true
+    content-exclusion-patterns: [".git",".build"]
+commands:
+  "<CRUX-x86_64-unknown-windows-msvc-debug.module>":
+    tool: phony
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\AddRecordFlow.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Models.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RootTabView.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RoutesView.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Theme.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\TodayView.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUX.swiftmodule"]
+    outputs: ["<CRUX-x86_64-unknown-windows-msvc-debug.module>"]
+
+  "<CRUXCore-x86_64-unknown-windows-msvc-debug.module>":
+    tool: phony
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\ColorMath.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\RouteSelector.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCore.swiftmodule"]
+    outputs: ["<CRUXCore-x86_64-unknown-windows-msvc-debug.module>"]
+
+  "<CRUXCoreTests-x86_64-unknown-windows-msvc-debug.module>":
+    tool: phony
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\ColorMathTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\RouteSelectorTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCoreTests.swiftmodule"]
+    outputs: ["<CRUXCoreTests-x86_64-unknown-windows-msvc-debug.module>"]
+
+  "<CRUXPackageDiscoveredTests-x86_64-unknown-windows-msvc-debug.module>":
+    tool: phony
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\CRUXCoreTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\all-discovered-tests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageDiscoveredTests.swiftmodule"]
+    outputs: ["<CRUXPackageDiscoveredTests-x86_64-unknown-windows-msvc-debug.module>"]
+
+  "<CRUXPackageTests-x86_64-unknown-windows-msvc-debug.module>":
+    tool: phony
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\runner.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageTests.swiftmodule"]
+    outputs: ["<CRUXPackageTests-x86_64-unknown-windows-msvc-debug.module>"]
+
+  "<CRUXPackageTests-x86_64-unknown-windows-msvc-debug.test>":
+    tool: phony
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.xctest"]
+    outputs: ["<CRUXPackageTests-x86_64-unknown-windows-msvc-debug.test>"]
+
+  "C.CRUX-x86_64-unknown-windows-msvc-debug.module":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\Sources\\CRUX\\AddRecordFlow.swift","D:\\L\\AI\\CRUX\\Sources\\CRUX\\Models.swift","D:\\L\\AI\\CRUX\\Sources\\CRUX\\RootTabView.swift","D:\\L\\AI\\CRUX\\Sources\\CRUX\\RoutesView.swift","D:\\L\\AI\\CRUX\\Sources\\CRUX\\Theme.swift","D:\\L\\AI\\CRUX\\Sources\\CRUX\\TodayView.swift","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\swift-version-40D8EE6859B32888.txt","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCore.swiftmodule","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\sources"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\AddRecordFlow.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Models.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RootTabView.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RoutesView.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Theme.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\TodayView.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUX.swiftmodule"]
+    description: "Compiling Swift Module 'CRUX' (6 sources)"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-module-name","CRUX","-emit-dependencies","-emit-module","-emit-module-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUX.swiftmodule","-output-file-map","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\output-file-map.json","-parse-as-library","-incremental","-c","@D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\sources","-I","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules","-target","x86_64-unknown-windows-msvc","-v","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\index\\store","-Onone","-enable-testing","-j16","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\ModuleCache","-parseable-output","-parse-as-library","-static","-emit-objc-header","-emit-objc-header-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\include\\CRUX-Swift.h","-swift-version","5","-sdk","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\SDKs\\Windows.sdk","-libc","MD","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-use-ld=lld","-g","-use-ld=lld","-Xcc","-D_MT","-Xcc","-D_DLL","-Xcc","-Xclang","-Xcc","--dependent-lib=msvcrt","-Xcc","-gdwarf","-package-name","crux"]
+
+  "C.CRUXCore-x86_64-unknown-windows-msvc-debug.module":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\Sources\\CRUXCore\\ColorMath.swift","D:\\L\\AI\\CRUX\\Sources\\CRUXCore\\RouteSelector.swift","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\swift-version-40D8EE6859B32888.txt","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\sources"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\ColorMath.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\RouteSelector.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCore.swiftmodule"]
+    description: "Compiling Swift Module 'CRUXCore' (2 sources)"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-module-name","CRUXCore","-emit-dependencies","-emit-module","-emit-module-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCore.swiftmodule","-output-file-map","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\output-file-map.json","-parse-as-library","-incremental","-c","@D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\sources","-I","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules","-target","x86_64-unknown-windows-msvc","-v","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\index\\store","-Onone","-enable-testing","-j16","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\ModuleCache","-parseable-output","-parse-as-library","-static","-emit-objc-header","-emit-objc-header-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\include\\CRUXCore-Swift.h","-swift-version","5","-sdk","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\SDKs\\Windows.sdk","-libc","MD","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-use-ld=lld","-g","-use-ld=lld","-Xcc","-D_MT","-Xcc","-D_DLL","-Xcc","-Xclang","-Xcc","--dependent-lib=msvcrt","-Xcc","-gdwarf","-package-name","crux"]
+
+  "C.CRUXCoreTests-x86_64-unknown-windows-msvc-debug.module":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\Tests\\CRUXCoreTests\\ColorMathTests.swift","D:\\L\\AI\\CRUX\\Tests\\CRUXCoreTests\\RouteSelectorTests.swift","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\swift-version-40D8EE6859B32888.txt","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCore.swiftmodule","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\sources"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\ColorMathTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\RouteSelectorTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCoreTests.swiftmodule"]
+    description: "Compiling Swift Module 'CRUXCoreTests' (2 sources)"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-module-name","CRUXCoreTests","-emit-dependencies","-emit-module","-emit-module-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCoreTests.swiftmodule","-output-file-map","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\output-file-map.json","-parse-as-library","-incremental","-c","@D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\sources","-I","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules","-target","x86_64-unknown-windows-msvc","-v","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\index\\store","-Onone","-enable-testing","-Xfrontend","-enable-cross-import-overlays","-j16","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\ModuleCache","-parseable-output","-parse-as-library","-static","-swift-version","5","-sdk","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\SDKs\\Windows.sdk","-libc","MD","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-use-ld=lld","-g","-use-ld=lld","-Xcc","-D_MT","-Xcc","-D_DLL","-Xcc","-Xclang","-Xcc","--dependent-lib=msvcrt","-Xcc","-gdwarf","-package-name","crux"]
+
+  "C.CRUXPackageDiscoveredTests-x86_64-unknown-windows-msvc-debug.module":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.derived\\CRUXCoreTests.swift","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.derived\\all-discovered-tests.swift","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\swift-version-40D8EE6859B32888.txt","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCoreTests.swiftmodule","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\sources"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\CRUXCoreTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\all-discovered-tests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageDiscoveredTests.swiftmodule"]
+    description: "Compiling Swift Module 'CRUXPackageDiscoveredTests' (2 sources)"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-module-name","CRUXPackageDiscoveredTests","-emit-dependencies","-emit-module","-emit-module-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageDiscoveredTests.swiftmodule","-output-file-map","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\output-file-map.json","-parse-as-library","-incremental","-c","@D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\sources","-I","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules","-target","x86_64-unknown-windows-msvc","-v","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\index\\store","-Onone","-enable-testing","-Xfrontend","-enable-cross-import-overlays","-j16","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\ModuleCache","-parseable-output","-parse-as-library","-static","-emit-objc-header","-emit-objc-header-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\include\\CRUXPackageDiscoveredTests-Swift.h","-sdk","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\SDKs\\Windows.sdk","-libc","MD","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-use-ld=lld","-g","-use-ld=lld","-Xcc","-D_MT","-Xcc","-D_DLL","-Xcc","-Xclang","-Xcc","--dependent-lib=msvcrt","-Xcc","-gdwarf","-package-name","crux"]
+
+  "C.CRUXPackageTests-x86_64-unknown-windows-msvc-debug.module":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.derived\\runner.swift","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\swift-version-40D8EE6859B32888.txt","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCoreTests.swiftmodule","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageDiscoveredTests.swiftmodule","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\sources"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\runner.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageTests.swiftmodule"]
+    description: "Compiling Swift Module 'CRUXPackageTests' (1 sources)"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-module-name","CRUXPackageTests","-emit-dependencies","-emit-module","-emit-module-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageTests.swiftmodule","-output-file-map","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\output-file-map.json","-parse-as-library","-incremental","-c","@D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\sources","-I","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules","-target","x86_64-unknown-windows-msvc","-v","-incremental","-enable-batch-mode","-serialize-diagnostics","-index-store-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\index\\store","-Onone","-enable-testing","-Xfrontend","-enable-cross-import-overlays","-j16","-DSWIFT_PACKAGE","-DDEBUG","-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE","-module-cache-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\ModuleCache","-parseable-output","-parse-as-library","-static","-emit-objc-header","-emit-objc-header-path","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\include\\CRUXPackageTests-Swift.h","-sdk","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\SDKs\\Windows.sdk","-libc","MD","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-use-ld=lld","-g","-use-ld=lld","-Xcc","-D_MT","-Xcc","-D_DLL","-Xcc","-Xclang","-Xcc","--dependent-lib=msvcrt","-Xcc","-gdwarf","-package-name","crux"]
+
+  "C.CRUXPackageTests-x86_64-unknown-windows-msvc-debug.test":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\CRUXCore.swiftmodule.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\ColorMath.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\RouteSelector.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\CRUXCoreTests.swiftmodule.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\ColorMathTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\RouteSelectorTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\CRUXCoreTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\CRUXPackageDiscoveredTests.swiftmodule.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\all-discovered-tests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\CRUXPackageTests.swiftmodule.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\runner.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.product\\Objects.LinkFileList"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.xctest"]
+    description: "Linking D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.xctest"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-v","-L","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug","-o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.xctest","-module-name","CRUXPackageTests","-emit-executable","@D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.product\\Objects.LinkFileList","-target","x86_64-unknown-windows-msvc","-sdk","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\SDKs\\Windows.sdk","-libc","MD","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\XCTest-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-I","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows","-L","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Platforms\\6.3.3\\Windows.platform\\Developer\\Library\\Testing-6.3.3\\usr\\lib\\swift\\windows\\x86_64","-use-ld=lld","-g","-use-ld=lld","-Xlinker","-debug:dwarf"]
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\CRUX.swiftmodule.o":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUX.swiftmodule"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\CRUX.swiftmodule.o"]
+    description: "Wrapping AST for CRUX for debugging"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-modulewrap","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUX.swiftmodule","-o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\CRUX.swiftmodule.o","-target","x86_64-unknown-windows-msvc"]
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","D:\\L\\AI\\CRUX\\Sources\\CRUX\\AddRecordFlow.swift","D:\\L\\AI\\CRUX\\Sources\\CRUX\\Models.swift","D:\\L\\AI\\CRUX\\Sources\\CRUX\\RootTabView.swift","D:\\L\\AI\\CRUX\\Sources\\CRUX\\RoutesView.swift","D:\\L\\AI\\CRUX\\Sources\\CRUX\\Theme.swift","D:\\L\\AI\\CRUX\\Sources\\CRUX\\TodayView.swift"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\sources"]
+    description: "Write auxiliary file D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\sources"
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\CRUXCore.swiftmodule.o":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCore.swiftmodule"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\CRUXCore.swiftmodule.o"]
+    description: "Wrapping AST for CRUXCore for debugging"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-modulewrap","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCore.swiftmodule","-o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\CRUXCore.swiftmodule.o","-target","x86_64-unknown-windows-msvc"]
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","D:\\L\\AI\\CRUX\\Sources\\CRUXCore\\ColorMath.swift","D:\\L\\AI\\CRUX\\Sources\\CRUXCore\\RouteSelector.swift"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\sources"]
+    description: "Write auxiliary file D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\sources"
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\CRUXCoreTests.swiftmodule.o":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCoreTests.swiftmodule"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\CRUXCoreTests.swiftmodule.o"]
+    description: "Wrapping AST for CRUXCoreTests for debugging"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-modulewrap","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXCoreTests.swiftmodule","-o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\CRUXCoreTests.swiftmodule.o","-target","x86_64-unknown-windows-msvc"]
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","D:\\L\\AI\\CRUX\\Tests\\CRUXCoreTests\\ColorMathTests.swift","D:\\L\\AI\\CRUX\\Tests\\CRUXCoreTests\\RouteSelectorTests.swift"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\sources"]
+    description: "Write auxiliary file D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\sources"
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\CRUXPackageDiscoveredTests.swiftmodule.o":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageDiscoveredTests.swiftmodule"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\CRUXPackageDiscoveredTests.swiftmodule.o"]
+    description: "Wrapping AST for CRUXPackageDiscoveredTests for debugging"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-modulewrap","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageDiscoveredTests.swiftmodule","-o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\CRUXPackageDiscoveredTests.swiftmodule.o","-target","x86_64-unknown-windows-msvc"]
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.derived\\CRUXCoreTests.swift","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.derived\\all-discovered-tests.swift"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\sources"]
+    description: "Write auxiliary file D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\sources"
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.derived\\all-discovered-tests.swift":
+    tool: test-discovery-tool
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\ColorMathTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\RouteSelectorTests.swift.o"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.derived\\CRUXCoreTests.swift","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.derived\\all-discovered-tests.swift"]
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\CRUXPackageTests.swiftmodule.o":
+    tool: shell
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageTests.swiftmodule"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\CRUXPackageTests.swiftmodule.o"]
+    description: "Wrapping AST for CRUXPackageTests for debugging"
+    args: ["C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe","-modulewrap","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageTests.swiftmodule","-o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\CRUXPackageTests.swiftmodule.o","-target","x86_64-unknown-windows-msvc"]
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\sources":
+    tool: write-auxiliary-file
+    inputs: ["<sources-file-list>","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.derived\\runner.swift"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\sources"]
+    description: "Write auxiliary file D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\sources"
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.derived\\runner.swift":
+    tool: test-entry-point-tool
+    inputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\Modules\\CRUXPackageDiscoveredTests.swiftmodule"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.derived\\runner.swift"]
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.product\\Objects.LinkFileList":
+    tool: write-auxiliary-file
+    inputs: ["<link-file-list>","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\CRUXCore.swiftmodule.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\ColorMath.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\RouteSelector.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\CRUXCoreTests.swiftmodule.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\ColorMathTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCoreTests.build\\RouteSelectorTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\CRUXCoreTests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\CRUXPackageDiscoveredTests.swiftmodule.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageDiscoveredTests.build\\all-discovered-tests.swift.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\CRUXPackageTests.swiftmodule.o","D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.build\\runner.swift.o"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.product\\Objects.LinkFileList"]
+    description: "Write auxiliary file D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXPackageTests.product\\Objects.LinkFileList"
+
+  "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\swift-version-40D8EE6859B32888.txt":
+    tool: write-auxiliary-file
+    inputs: ["<swift-get-version>","C:\\Users\\Lin\\AppData\\Local\\Programs\\Swift\\Toolchains\\6.3.3+Asserts\\usr\\bin\\swiftc.exe"]
+    outputs: ["D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\swift-version-40D8EE6859B32888.txt"]
+    always-out-of-date: "true"
+    description: "Write auxiliary file D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\swift-version-40D8EE6859B32888.txt"
+
+  "PackageStructure":
+    tool: package-structure-tool
+    inputs: ["D:\\L\\AI\\CRUX\\Sources\\CRUX/","D:\\L\\AI\\CRUX\\Sources\\CRUXCore/","D:\\L\\AI\\CRUX\\Tests\\CRUXCoreTests/","D:\\L\\AI\\CRUX\\Package.swift","D:\\L\\AI\\CRUX\\Package.resolved"]
+    outputs: ["<PackageStructure>"]
+    description: "Planning build"
+    allow-missing-inputs: true
+

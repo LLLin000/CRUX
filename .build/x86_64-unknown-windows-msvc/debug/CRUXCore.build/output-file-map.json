@@ -1,0 +1,19 @@
+{
+  "": {
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\primary.swiftdeps"
+  },
+  "D:\\L\\AI\\CRUX\\Sources\\CRUXCore\\ColorMath.swift": {
+    "dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\ColorMath.d",
+    "object": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\ColorMath.swift.o",
+    "swiftmodule": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\ColorMath~partial.swiftmodule",
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\ColorMath.swiftdeps",
+    "diagnostics": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\ColorMath.dia"
+  },
+  "D:\\L\\AI\\CRUX\\Sources\\CRUXCore\\RouteSelector.swift": {
+    "dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\RouteSelector.d",
+    "object": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\RouteSelector.swift.o",
+    "swiftmodule": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\RouteSelector~partial.swiftmodule",
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\RouteSelector.swiftdeps",
+    "diagnostics": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUXCore.build\\RouteSelector.dia"
+  }
+}

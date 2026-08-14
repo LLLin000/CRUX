@@ -1,0 +1,10 @@
+{
+  "servers": {
+    "sourcekit-lsp": {
+      "command": "D:\\L\\AI\\CRUX\\tools\\sourcekit-lsp-wrapper.cmd",
+      "args": [],
+      "fileTypes": [".swift"],
+      "rootMarkers": ["Package.swift", ".git"]
+    }
+  }
+}

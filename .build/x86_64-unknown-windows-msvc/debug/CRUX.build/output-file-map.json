@@ -1,0 +1,47 @@
+{
+  "": {
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\primary.swiftdeps"
+  },
+  "D:\\L\\AI\\CRUX\\Sources\\CRUX\\AddRecordFlow.swift": {
+    "dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\AddRecordFlow.d",
+    "object": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\AddRecordFlow.swift.o",
+    "swiftmodule": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\AddRecordFlow~partial.swiftmodule",
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\AddRecordFlow.swiftdeps",
+    "diagnostics": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\AddRecordFlow.dia"
+  },
+  "D:\\L\\AI\\CRUX\\Sources\\CRUX\\Models.swift": {
+    "dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Models.d",
+    "object": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Models.swift.o",
+    "swiftmodule": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Models~partial.swiftmodule",
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Models.swiftdeps",
+    "diagnostics": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Models.dia"
+  },
+  "D:\\L\\AI\\CRUX\\Sources\\CRUX\\RootTabView.swift": {
+    "dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RootTabView.d",
+    "object": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RootTabView.swift.o",
+    "swiftmodule": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RootTabView~partial.swiftmodule",
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RootTabView.swiftdeps",
+    "diagnostics": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RootTabView.dia"
+  },
+  "D:\\L\\AI\\CRUX\\Sources\\CRUX\\RoutesView.swift": {
+    "dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RoutesView.d",
+    "object": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RoutesView.swift.o",
+    "swiftmodule": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RoutesView~partial.swiftmodule",
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RoutesView.swiftdeps",
+    "diagnostics": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\RoutesView.dia"
+  },
+  "D:\\L\\AI\\CRUX\\Sources\\CRUX\\Theme.swift": {
+    "dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Theme.d",
+    "object": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Theme.swift.o",
+    "swiftmodule": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Theme~partial.swiftmodule",
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Theme.swiftdeps",
+    "diagnostics": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\Theme.dia"
+  },
+  "D:\\L\\AI\\CRUX\\Sources\\CRUX\\TodayView.swift": {
+    "dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\TodayView.d",
+    "object": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\TodayView.swift.o",
+    "swiftmodule": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\TodayView~partial.swiftmodule",
+    "swift-dependencies": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\TodayView.swiftdeps",
+    "diagnostics": "D:\\L\\AI\\CRUX\\.build\\x86_64-unknown-windows-msvc\\debug\\CRUX.build\\TodayView.dia"
+  }
+}

@@ -64,16 +64,32 @@
 		1A0000000000000000000009 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				1A0000000000000000000012 /* Models.swift */,
+				1A000000000000000000001C /* CRUXCore */,
+				1A0000000000000000000008 /* CRUX */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		1A000000000000000000001C /* CRUXCore */ = {
+			isa = PBXGroup;
+			children = (
 				1A0000000000000000000013 /* ColorMath.swift */,
 				1A0000000000000000000014 /* RouteSelector.swift */,
+			);
+			path = CRUXCore;
+			sourceTree = "<group>";
+		};
+		1A0000000000000000000008 /* CRUX */ = {
+			isa = PBXGroup;
+			children = (
+				1A0000000000000000000012 /* Models.swift */,
 				1A0000000000000000000015 /* Theme.swift */,
 				1A0000000000000000000016 /* RootTabView.swift */,
 				1A0000000000000000000017 /* TodayView.swift */,
 				1A0000000000000000000018 /* RoutesView.swift */,
 				1A0000000000000000000019 /* AddRecordFlow.swift */,
 			);
-			path = Sources/CRUX;
+			path = CRUX;
 			sourceTree = "<group>";
 		};
 		1A000000000000000000000A /* Products */ = {
