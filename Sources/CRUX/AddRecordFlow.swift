@@ -208,7 +208,7 @@ struct GymSearchView: View {
 
     var body: some View {
         NavigationStack {
-            List(results, id: \.self) { item in
+            List(Array(results.enumerated()), id: \.offset) { _, item in
                 Button {
                     onPick(item.name ?? "未知岩馆",
                            item.placemark.coordinate,

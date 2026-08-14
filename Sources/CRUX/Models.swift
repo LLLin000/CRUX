@@ -6,16 +6,16 @@
 import Foundation
 import SwiftData
 
-enum GradeSystem: String, Codable {
+enum GradeSystem: String, Codable, Hashable {
     case vScale   // V0–V17
     case font     // Font (French) scale — future
 }
 
-enum RouteColor: String, Codable, CaseIterable {
+enum RouteColor: String, Codable, CaseIterable, Hashable {
     case blue, red, yellow, green, purple, black, gray, orange
 }
 
-enum RouteResult: String, Codable {
+enum RouteResult: String, Codable, Hashable {
     case flash    // first try
     case top      // completed, multiple tries
     case project  // not yet sent

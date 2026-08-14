@@ -71,9 +71,9 @@ struct SeededRouteSelector {
 
     // MARK: mask sampling (bbox-local raster -> canonical image pixel coords)
 
-    private func sampleMask(_ h: HoldGeometry,
-                            pixels: (Int, Int) -> (r: Double, g: Double, b: Double)?,
-                            w: Int, hgt: Int) -> [(r: Double, g: Double, b: Double)] {
+    private static func sampleMask(_ h: HoldGeometry,
+                                   pixels: (Int, Int) -> (r: Double, g: Double, b: Double)?,
+                                   w: Int, hgt: Int) -> [(r: Double, g: Double, b: Double)] {
         // RLE decode: COCO-style counts array (run-lengths of 0s/1s alternating)
         let counts = decodeRLE(h.maskRLE)
         var out: [(r: Double, g: Double, b: Double)] = []
@@ -97,7 +97,7 @@ struct SeededRouteSelector {
         return out
     }
 
-    private func decodeRLE(_ data: Data) -> [Int] {
+    private static func decodeRLE(_ data: Data) -> [Int] {
         // COCO RLE counts serialized as int32 little-endian array (our storage contract)
         let ints = data.withUnsafeBytes { Array($0.bindMemory(to: Int32.self)) }
         return ints.map { Int($0) }
