@@ -33,7 +33,7 @@ FINAL_CKPT = OUTPUT_DIR / "crux-hold-seg-research.pth"
 CLASS_NAMES = ["hold", "volume"]
 
 
-def main(fast_dev_run: bool, batch_size: int) -> None:
+def main(fast_dev_run: bool, batch_size: int, num_workers: int) -> None:
     seed_all(SEED)
     variant = RFDETRSegSmall(num_classes=NUM_CLASSES, resolution=RESOLUTION)
     variant.model_config.model_name = type(variant).__name__
@@ -45,7 +45,7 @@ def main(fast_dev_run: bool, batch_size: int) -> None:
         epochs=2 if fast_dev_run else 100,
         batch_size=batch_size,
         grad_accum_steps=4 if not fast_dev_run else 1,  # effective batch 4 at bs=1
-        num_workers=2,
+        num_workers=num_workers,                   # 0 on Windows: spawn workers crash
         use_ema=False,
         run_test=False,
         compute_train_metrics=True,
@@ -94,5 +94,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--fast-dev-run", action="store_true")
     ap.add_argument("--batch-size", type=int, default=1)  # 8GB VRAM: bs=1 at 384px seg
+    ap.add_argument("--num-workers", type=int, default=0)  # 0 on Windows (spawn worker crashes)
     args = ap.parse_args()
-    main(args.fast_dev_run, args.batch_size)
+    main(args.fast_dev_run, args.batch_size, args.num_workers)

@@ -27,7 +27,7 @@
 |---|---|---|---|
 | D1 | 语言/框架 | SwiftUI + SwiftData，iOS 17+，iPhone only | 单用户记录类 App 的 2026 标准组合 |
 | D2 | 导航 | **底部 2 主入口：`今日 \| 图鉴` + 独立 `＋`**。设置从今日左上角进；加记录时 gym 用地图选。状态驱动导航（sheet/跳转是 VM 里的 enum，syncups 模式） | 产品气质：核心行为只有看/加/看；相机用 fullScreenCover |
-| D3 | 模型运行时 | **首选候选：RF-DETR-Seg**（roboflow，Apache-2.0）→ 官方 Core ML 导出（torch.export + coremltools，`coreml_precision="float16"`）→ 自写 Swift decode/mask 重建。**D0.5 Gate A/B/C 通过后冻结，否则切 RTMDet-Ins** | 唯一有官方文档验证原生 Core ML seg 导出的 permissive 模型；端到端无 NMS；mask AP 40.3（Nano）/ 43.1（S）。官方 export 标 experimental，故不视为已定死 |
+| D3 | 模型运行时 | **首选候选：RF-DETR-Seg**（roboflow，Apache-2.0）→ **ONNX 导出 + iOS 端 ONNX Runtime（CoreML EP 优先，CPU 兜底）**（v1.3 修正：无 Mac 环境，Core ML .mlpackage 导出需 macOS，改为 ONNX 全跨平台路线）→ 自写 Swift decode/mask 重建。**D0.5 Gate A/B/C 通过后冻结，否则切 RTMDet-Ins** | ONNX 导出纯跨平台（torch.onnx，Windows 验证可行）；onnxruntime-swift 是微软官方 iOS 推理库；DINOv2 transformer 在 ANE 上的落位仍是最大未知（CoreML EP 不友好则 CPU/GPU） |
 | D4 | 分割类别 | 只训 `hold` + `volume`，**颜色不进模型** | 泛化性最好；颜色是后处理，架构解耦 |
 | D5 | 颜色 | mask 内像素 Lab median（**算法事实**）；seed 点选后 CIEDE2000（ΔE00）匹配。**阈值是 initial heuristic（~5-10），不是 invariant**，D0.5/D1 baseline 校准。**所有 Lab 一律从 canonical sRGB 图像计算**（v1.2.1） | Lab 抗光照优于 RGB；ΔE00 优于 CIE76 欧氏；统一色彩空间消除 P3/sRGB 偏差 |
 | D6 | 空间拆分 | **seeded 流程**：seed → ΔE 同色候选 → 空间算法生成若干 group → 默认选"包含 seed 的 group" → 用户 ± 修正。DBSCAN(eps≈2×岩点直径, min_samples=2) 是 initial heuristic；**参数不得当产品 invariant** | DBSCAN min_samples=1 ≡ 连通分量（数学事实）；失败时用户手动修正兜底 |
@@ -36,9 +36,14 @@
 | D9 | 相册/相机/地图 | PhotosPicker（免权限）+ UIImagePickerController 包装（相机）+ **MKLocalSearch 选 gym POI**（v1.2.1） | AVFoundation 自定义相机仅在需要实时检测 UI 时引入 |
 | D10 | 数据起点 | Kaggle 12GB 数据集（VIA polygon 标注）→ 转 COCO 格式；climbnet 权重（Apache）预标注 | 不用从零标 300-500 张。research/production 分离见 §2 |
 
-**推理规格（全链统一）**：`RF-DETR-Seg → native Core ML .mlpackage → FP16 first`。
-- **FP16 是 Core ML MVP 规格**（`coreml_precision="float16"`，ANE-oriented）；`int8` 参数对应 TFLite 量化，不用于 Core ML。
+**推理规格（全链统一，v1.3 修正）**：`RF-DETR-Seg → ONNX → iOS onnxruntime（CoreML EP / CPU）`。
+- **FP16/INT8**：ONNX 导出的量化选项（rfdetr `export(format="onnx")` 支持 fp16/int8 优化），Gate C 实测决定；不再依赖 coremltools。
 - **分辨率不锁 640px**：官方 Nano/S/M 标准 312/384/432；实际取 384/432/512，由 D0.5 Gate C 真机 benchmark 决定。
+
+**构建与发布（v1.3 更新，无本地 Mac）**：
+- **当前阶段（发布推迟，功能/UI 测试优先）**：Codemagic（免费 500 分钟/月 macOS M2）跑 **Xcode 编译 + iOS 模拟器测试**（UI 测试/单元测试不需要 developer 账号，不需要签名）。
+- **发布阶段（用户购买 Apple Developer Program $99/年 后）**：Codemagic 自动签名 → TestFlight → 真机安装。全程无需本地 Mac。
+- 唯一硬门槛：Apple Developer Program（账号非 Mac），购买前不做任何发布工作。
 
 ## 2. 许可证与数据策略（自始干净，无 AGPL）
 
@@ -202,7 +207,7 @@ SwiftUI 渲染：canonical sRGB image + scaledToFit；touch 坐标 → 逆变换
 | 里程碑 | 内容 | 验收 |
 |---|---|---|
 | **D0**（第 1 周） | **两套标注规范**：① 训练标注 `instance_id, class=hold\|volume, polygon`（COCO 格式）；② benchmark 标注 `instance_id, route_id, route_color, is_start, is_finish`。Kaggle 数据转 COCO 脚本 | 规范文档 + 转换脚本跑通，样本可视化 |
-| **D0.5**（第 1-2 周，关键 spike） | **RF-DETR-Seg 链路验证，只 gate runtime/export**：10-20 张小数据微调（research weights）→ 官方 Core ML 导出（FP16）→ iPhone 真机 | **Gate A**：PyTorch→CoreML FP16→iPhone 完整导出；**Gate B**：输出正确（mask shape/bbox 正确、无 operator crash、数值无异常）；**Gate C**：384/432/512 三档 p50/p95/peak memory。**只有 A/B/C runtime 问题才触发切 RTMDet**；hold recall 不足归 D1/D2 |
+| **D0.5**（第 1-2 周，关键 spike） | **RF-DETR-Seg 链路验证，只 gate runtime/export（v1.3：ONNX 路线）**：10-20 张小数据微调（research weights）→ **ONNX 导出（Windows 可做）** → iPhone 真机（onnxruntime） | **Gate A**：PyTorch→ONNX 完整导出 + 推理数值一致性（Windows 端 torch 对比）；**Gate B**：输出正确（mask shape/bbox 正确、无 crash、数值无异常）；**Gate C**：384/432/512 三档 p50/p95/peak memory（真机）。**只有 A/B/C runtime 问题才触发切 RTMDet**；hold recall 不足归 D1/D2 |
 | **D1**（第 2-3 周） | 数据收集：**自有实拍（production）** + Kaggle（research，仅调参）+ climbnet 预标注 + 人工修正；**建立 RouteBenchmark**（100-200 条真实路线、跨多岩馆） | production：**≥100 images AND ≥1000 instances**（初始目标，不死板）；统计 gym/wall/lighting/device diversity；验证集**按岩馆隔离**；RouteBenchmark 完成 |
 | **D2**（第 4 周） | 正式训练 RF-DETR-Seg-S/M（production weights）+ Core ML 导出 FP16 + 真机基准 + RouteBenchmark 评测（双层，见下） | **产品 KPI 达标** |
 | **D3**（第 5 周） | 错误案例分析 + 补标迭代 + 模型版本迭代 | 集成 M2；**用 provenance 数据验证新模型把平均修正数降下来** |
@@ -228,7 +233,7 @@ KPI 清单：
 
 | 风险 | 等级 | 应对 |
 |---|---|---|
-| **RF-DETR DINOv2 骨干 ANE 支持未验证**（最大未知；官方 export 标 experimental） | 高 | **D0.5 Gate A/B/C 先行**（3-5 天）；只有 runtime 问题才切 RTMDet-Ins |
+| **DINOv2 骨干在 iOS onnxruntime 上的性能/兼容未验证**（最大未知；CoreML EP 对 transformer 支持有限） | 高 | **D0.5 Gate A/B/C 先行**；CoreML EP 不友好则 CPU/GPU EP（单图场景可接受）；仍不过切 RTMDet-Ins |
 | RF-DETR 自定义数据训练流程未验证 | 中 | D0.5 用 10-20 张小数据先跑通全链 |
 | Kaggle 数据许可未厘清（NC-SA / BY-SA 冲突） | 中 | research/production 分离；Kaggle 仅在许可允许范围内 research |
 | 老机型（A15/A16）seg 性能未知 | 中 | Gate C 起多机型基准；不达标降分辨率档（384 起）或换小模型 |
