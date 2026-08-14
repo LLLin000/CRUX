@@ -33,9 +33,10 @@ FINAL_CKPT = OUTPUT_DIR / "crux-hold-seg-research.pth"
 CLASS_NAMES = ["hold", "volume"]
 
 
-def main(fast_dev_run: bool, batch_size: int, num_workers: int, resume: str | None) -> None:
+def main(fast_dev_run: bool, batch_size: int, num_workers: int, resume: str | None,
+         resolution: int = RESOLUTION, multi_scale: bool = True) -> None:
     seed_all(SEED)
-    variant = RFDETRSegSmall(num_classes=NUM_CLASSES, resolution=RESOLUTION)
+    variant = RFDETRSegSmall(num_classes=NUM_CLASSES, resolution=resolution)
     variant.model_config.model_name = type(variant).__name__
 
     train_config = SegmentationTrainConfig(
@@ -47,11 +48,11 @@ def main(fast_dev_run: bool, batch_size: int, num_workers: int, resume: str | No
         grad_accum_steps=4 if not fast_dev_run else 1,  # effective batch 4 at bs=1
         num_workers=num_workers,                   # 0 on Windows: spawn workers crash
         resume=resume,
+        multi_scale=multi_scale,                   # parameterized (on by default; author-match)
         use_ema=False,
         run_test=False,
         compute_train_metrics=True,
         compute_val_loss=True,
-        multi_scale=False,                         # deterministic for the spike
         expanded_scales=False,
         do_random_resize_via_padding=False,
         tensorboard=False,
@@ -97,5 +98,10 @@ if __name__ == "__main__":
     ap.add_argument("--batch-size", type=int, default=1)  # 8GB VRAM: bs=1 at 384px seg
     ap.add_argument("--num-workers", type=int, default=0)  # 0 on Windows (spawn worker crashes)
     ap.add_argument("--resume", type=str, default=None, help="path to .ckpt to resume training")
+    ap.add_argument("--resolution", type=int, default=RESOLUTION, help="input size (multiple of 24)")
+    ap.add_argument("--multi-scale", dest="multi_scale", action="store_true", default=True,
+                    help="multi-scale training (default on; author-match)")
+    ap.add_argument("--no-multi-scale", dest="multi_scale", action="store_false")
     args = ap.parse_args()
-    main(args.fast_dev_run, args.batch_size, args.num_workers, args.resume)
+    main(args.fast_dev_run, args.batch_size, args.num_workers, args.resume,
+         resolution=args.resolution, multi_scale=args.multi_scale)
