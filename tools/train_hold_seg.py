@@ -20,6 +20,7 @@ from pathlib import Path
 import torch
 from rfdetr import RFDETRSegSmall
 from rfdetr.config import SegmentationTrainConfig
+from rfdetr.datasets.aug_configs import AUG_CONSERVATIVE
 from rfdetr.training import RFDETRDataModule, RFDETRModelModule, build_trainer
 from rfdetr.training.callbacks.best_model import BestModelCallback
 from rfdetr.utilities.reproducibility import seed_all
@@ -28,13 +29,17 @@ SEED = 42
 NUM_CLASSES = 2          # hold(0) + volume(1)
 RESOLUTION = 384         # Gate C will benchmark 384/432/512; 384 for the spike
 DATASET_DIR = Path("data/crux-dataset")
-OUTPUT_DIR = Path("output/rfdetr_seg_small")
+OUTPUT_DIR = Path("output/rfdetr_seg_small")   # overridable via --output-dir
 FINAL_CKPT = OUTPUT_DIR / "crux-hold-seg-research.pth"
 CLASS_NAMES = ["hold", "volume"]
 
 
 def main(fast_dev_run: bool, batch_size: int, num_workers: int, resume: str | None,
-         resolution: int = RESOLUTION, multi_scale: bool = True) -> None:
+         resolution: int = RESOLUTION, multi_scale: bool = True, epochs: int = 100,
+         output_dir: str = "output/rfdetr_seg_small") -> None:
+    global OUTPUT_DIR, FINAL_CKPT
+    OUTPUT_DIR = Path(output_dir)
+    FINAL_CKPT = OUTPUT_DIR / "crux-hold-seg-research.pth"
     seed_all(SEED)
     variant = RFDETRSegSmall(num_classes=NUM_CLASSES, resolution=resolution)
     variant.model_config.model_name = type(variant).__name__
@@ -43,12 +48,13 @@ def main(fast_dev_run: bool, batch_size: int, num_workers: int, resume: str | No
         dataset_file="coco",                       # local COCO, Roboflow layout
         dataset_dir=str(DATASET_DIR),
         output_dir=str(OUTPUT_DIR),
-        epochs=2 if fast_dev_run else 100,
+        epochs=epochs,
         batch_size=batch_size,
         grad_accum_steps=4 if not fast_dev_run else 1,  # effective batch 4 at bs=1
         num_workers=num_workers,                   # 0 on Windows: spawn workers crash
         resume=resume,
         multi_scale=multi_scale,                   # parameterized (on by default; author-match)
+        aug_config=AUG_CONSERVATIVE,               # brightness/contrast jitter: lighting robustness
         use_ema=False,
         run_test=False,
         compute_train_metrics=True,
@@ -99,9 +105,13 @@ if __name__ == "__main__":
     ap.add_argument("--num-workers", type=int, default=0)  # 0 on Windows (spawn worker crashes)
     ap.add_argument("--resume", type=str, default=None, help="path to .ckpt to resume training")
     ap.add_argument("--resolution", type=int, default=RESOLUTION, help="input size (multiple of 24)")
+    ap.add_argument("--epochs", type=int, default=None, help="override epochs (incremental short runs)")
+    ap.add_argument("--output-dir", type=str, default="output/rfdetr_seg_small")
     ap.add_argument("--multi-scale", dest="multi_scale", action="store_true", default=True,
                     help="multi-scale training (default on; author-match)")
     ap.add_argument("--no-multi-scale", dest="multi_scale", action="store_false")
     args = ap.parse_args()
+    epochs = args.epochs if args.epochs else (2 if args.fast_dev_run else 100)
     main(args.fast_dev_run, args.batch_size, args.num_workers, args.resume,
-         resolution=args.resolution, multi_scale=args.multi_scale)
+         resolution=args.resolution, multi_scale=args.multi_scale, epochs=epochs,
+         output_dir=args.output_dir)

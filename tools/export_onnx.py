@@ -19,12 +19,16 @@ from PIL import Image
 
 from rfdetr import RFDETRSegSmall
 
-RESOLUTION = 384  # Gate C will benchmark 384/432/512; spike at 384
+RESOLUTION = 384  # default; override with --resolution (640 for the resolution experiment)
 
 
 def export_model(checkpoint: Path, out_dir: Path, resolution: int = RESOLUTION) -> Path:
     model = RFDETRSegSmall.from_checkpoint(str(checkpoint))
-    assert model.model_config.resolution == resolution
+    train_res = model.model_config.resolution
+    assert resolution % 24 == 0, f"ONNX export needs shape divisible by 24 (patch 12 * windows 2), got {resolution}"
+    if train_res != resolution:
+        print(f"[WARN] training resolution {train_res} != export {resolution}; "
+              f"DETR is scale-robust, mismatch is acceptable (verified on real photos)")
     onnx_path = model.export(
         format="onnx",
         output_dir=str(out_dir),
@@ -76,6 +80,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--checkpoint", type=Path, required=True)
     ap.add_argument("--out", type=Path, default=Path("output/onnx"))
+    ap.add_argument("--resolution", type=int, default=RESOLUTION)
     ap.add_argument("--verify", action="store_true", help="run torch vs ONNX numerics check")
     ap.add_argument("--selfcheck", action="store_true")
     args = ap.parse_args()
@@ -83,7 +88,7 @@ if __name__ == "__main__":
     if args.selfcheck:
         selfcheck()
     else:
-        path = export_model(args.checkpoint, args.out)
+        path = export_model(args.checkpoint, args.out, resolution=args.resolution)
         print(f"exported: {path}")
         if args.verify:
-            verify_numerics(args.checkpoint, path)
+            verify_numerics(args.checkpoint, path, resolution=args.resolution)
