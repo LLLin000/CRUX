@@ -151,6 +151,9 @@ def train_one_epoch(model, loader, opt, device, epoch):
         loss = sum(l for l in loss_dict.values())
         opt.zero_grad()
         loss.backward()
+        # lr was 0.005 -> 1.8e17 blowup at step 5 (batch 2, 12 imgs, mask loss ~20).
+        # clip as belt-and-suspenders on top of the lower LR.
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 10.0)
         opt.step()
         total += float(loss)
         if i % 5 == 0:
@@ -236,7 +239,9 @@ def main(epochs: int, resolution: int, output_dir: Path) -> None:
     val_loader = torch.utils.data.DataLoader(val_ds, batch_size=1, shuffle=False,
                                              collate_fn=collate, num_workers=0)
 
-    opt = torch.optim.SGD(model.parameters(), lr=0.005, momentum=0.9, weight_decay=1e-4)
+    # reference default 0.005 assumes batch 16; batch 2 on 12 images blew up
+    # (1.8e17 at step 5). 0.0005 + grad clip is stable.
+    opt = torch.optim.SGD(model.parameters(), lr=0.0005, momentum=0.9, weight_decay=1e-4)
     sched = torch.optim.lr_scheduler.MultiStepLR(opt, milestones=[int(epochs * 0.4), int(epochs * 0.7)], gamma=0.1)
 
     output_dir.mkdir(parents=True, exist_ok=True)
