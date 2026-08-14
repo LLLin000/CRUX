@@ -137,13 +137,11 @@ def outline(img: np.ndarray, hold: Hold, color, thickness: int) -> None:
 
 
 def cartoon(img_rgb: np.ndarray, holds: list[Hold], matched_ids: list[int]) -> np.ndarray:
-    """Badge-style cartoon, deep ink-blue backdrop:
-    - backdrop: fixed navy radial gradient (independent of the photo's murky
-      dominant color — dark walls give meaningless palette), soft center glow
-    - ALL holds keep posterized surface detail (L 6 levels, ab 8 levels so
-      hues don't smear) stamped as stickers, slightly lifted so they read
-    - matched route: white outline + modest saturation bump (1.25, not 1.6)
-    - edges: light ink (dark backdrop needs light lines)"""
+    """Badge-style cartoon that NEVER recolors holds:
+    - backdrop: fixed navy radial gradient + soft center glow
+    - ALL holds stamped from the ORIGINAL photo (true colors, full detail)
+    - matched route: double outline (dark under-edge + white top edge) only
+    - edges: light ink lines so the navy backdrop keeps some texture"""
     h, w = img_rgb.shape[:2]
 
     # --- fixed navy gradient backdrop ---
@@ -157,40 +155,28 @@ def cartoon(img_rgb: np.ndarray, holds: list[Hold], matched_ids: list[int]) -> n
     halo = np.exp(-r * 2.2)[..., None]
     bg = bg * 0.88 + 255.0 * 0.12 * halo
 
-    # --- posterized holds (keep surface detail, lift a bit for sticker feel) ---
-    lab = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2LAB).astype(np.float32)
-
-    def quantize(x, levels):
-        return np.round(x * (levels - 1) / 255.0) * (255.0 / (levels - 1))
-
-    lab[..., 0] = np.clip(quantize(lab[..., 0], 6) + 14.0, 0, 255)  # L + lift
-    lab[..., 1] = quantize(lab[..., 1], 8)   # more levels -> no hue smearing
-    lab[..., 2] = quantize(lab[..., 2], 8)
-    post = cv2.cvtColor(lab.astype(np.uint8), cv2.COLOR_LAB2RGB).astype(np.float32)
-
+    # --- holds: original pixels, unchanged color ---
     for hld in holds:
-        bg[hld.mask] = post[hld.mask]
+        bg[hld.mask] = img_rgb[hld.mask]
 
     out = bg.astype(np.uint8)
 
-    # --- light ink edges (dark backdrop needs light lines) ---
+    # --- light ink edges, BACKGROUND ONLY (hold pixels stay untouched) ---
     gray = cv2.cvtColor(np.array(img_rgb), cv2.COLOR_RGB2GRAY)
     edges = cv2.Canny(gray, 60, 150)
     edges = cv2.dilate(edges, np.ones((2, 2), np.uint8))
-    out[edges > 0] = np.clip(out[edges > 0].astype(int) * 1.35, 0, 255).astype(np.uint8)
+    all_holds = np.zeros((h, w), bool)
+    for hld in holds:
+        all_holds |= hld.mask
+    ink = edges & ~all_holds
+    out[ink] = np.clip(out[ink].astype(int) * 1.35, 0, 255).astype(np.uint8)
 
-    # --- matched route: lift + double outline (dark under-edge, white top) ---
+    # --- matched route: outline only, colors untouched ---
     for hid in matched_ids:
         hld = next(x for x in holds if x.id == hid)
-        ys, xs = np.nonzero(hld.mask)
-        px = out[ys, xs].astype(np.float32)
-        lab_px = cv2.cvtColor(px[None].astype(np.uint8), cv2.COLOR_RGB2LAB)[0].astype(np.float32)
-        lab_px[..., 0] = np.clip(lab_px[..., 0] * 1.18, 0, 255)  # lift vs navy bg
-        lab_px[..., 1] *= 1.25   # modest bump — heavy boost looked garish
-        lab_px[..., 2] *= 1.25
-        out[ys, xs] = cv2.cvtColor(lab_px[None].astype(np.uint8), cv2.COLOR_LAB2RGB)[0]
         outline(out, hld, (18, 26, 40), 6)    # dark under-edge (sticker shadow)
         outline(out, hld, (255, 255, 255), 3)  # white top edge
+    return out
 
 
 def route_order(holds: list[Hold], matched_ids: list[int]) -> list[int]:
