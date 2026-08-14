@@ -29,7 +29,10 @@ class Annotator:
     def __init__(self, coco_path: Path):
         self.coco_path = coco_path
         self.coco = json.loads(coco_path.read_text(encoding="utf-8"))
+        # data/preannotations/<tag>/xxx.json -> data/realpic (fallback: repo root)
         self.img_dir = coco_path.parent.parent.parent / "realpic"
+        if not self.img_dir.exists():
+            self.img_dir = Path("data/realpic")
         self.anns_by_img: dict[int, list[dict]] = {}
         for a in self.coco["annotations"]:
             self.anns_by_img.setdefault(a["image_id"], []).append(a)
