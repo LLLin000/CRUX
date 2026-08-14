@@ -16,9 +16,12 @@ workflows:
           xcodebuild -project CRUX.xcodeproj -scheme CRUX \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO build
-      - name: Run unit tests (SwiftPM)
+      - name: Run unit tests (SwiftPM, CRUXCore only)
         script: |
-          swift test
+          # Build ONLY the test dependency chain (CRUXCore + tests) so the
+          # iOS-only CRUX UI target (SwiftUI/UIKit) is not compiled on macOS.
+          swift build --target CRUXCoreTests
+          swift test --skip-build
     artifacts:
       - .build/**/*.log
     publishing:
