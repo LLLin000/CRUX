@@ -89,9 +89,9 @@ struct SeededRouteSelector {
                     let px = Int(nx * Double(w)), py = Int(ny * Double(hgt))
                     if let c = pixels(px, py) { out.append(c) }
                 }
-                idx += count
-                value = 1 - value
+                idx += 1
             }
+            value = 1 - value  // flip once per RLE run boundary, not per pixel
         }
         return out
     }
