@@ -32,7 +32,7 @@ struct SeededRouteSelector {
 
     /// Median Lab per hold from the canonical sRGB image pixels inside each mask.
     static func medianLabPerHold(holds: [HoldGeometry],
-                                 imagePixels: (x: Int, y: Int) -> (r: Double, g: Double, b: Double)?,
+                                 imagePixels: (Int, Int) -> (r: Double, g: Double, b: Double)?,
                                  imageWidth: Int, imageHeight: Int) -> [(l: Double, a: Double, b: Double)] {
         holds.map { h in
             let labs = sampleMask(h, pixels: imagePixels, w: imageWidth, hgt: imageHeight)
@@ -72,7 +72,7 @@ struct SeededRouteSelector {
     // MARK: mask sampling (bbox-local raster -> canonical image pixel coords)
 
     private func sampleMask(_ h: HoldGeometry,
-                            pixels: (x: Int, y: Int) -> (r: Double, g: Double, b: Double)?,
+                            pixels: (Int, Int) -> (r: Double, g: Double, b: Double)?,
                             w: Int, hgt: Int) -> [(r: Double, g: Double, b: Double)] {
         // RLE decode: COCO-style counts array (run-lengths of 0s/1s alternating)
         let counts = decodeRLE(h.maskRLE)
