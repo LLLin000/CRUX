@@ -124,76 +124,73 @@ def main(photo: Path, model_path: Path, seed_lab: np.ndarray, out_dir: Path) -> 
 
 
 def outline(img: np.ndarray, hold: Hold, color, thickness: int) -> None:
-    m = (hold.mask * 255).astype(np.uint8)
-    contours, _ = cv2.findContours(m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    cv2.drawContours(img, contours, -1, color, thickness)
+    """Smooth outline via the shared edge-preserving two-stage RDP polygon
+    (same path as pre-annotations) — never the raw raster mask edge."""
+    poly = mask_to_polygon(hold.mask)
+    if poly is None:
+        m = (hold.mask * 255).astype(np.uint8)
+        contours, _ = cv2.findContours(m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cv2.drawContours(img, contours, -1, color, thickness)
+        return
+    pts = np.array(poly[0]).reshape(-1, 2).astype(np.int32)
+    cv2.polylines(img, [pts], True, color, thickness, cv2.LINE_AA)
 
 
 def cartoon(img_rgb: np.ndarray, holds: list[Hold], matched_ids: list[int]) -> np.ndarray:
-    """Badge-style cartoon: radial-gradient backdrop (from wall's dominant
-    color into deep shade), holds keep their posterized surface detail and are
-    stamped on top like stickers, matched holds get saturation boost + white
-    outline so the route reads instantly. Ink edges tie it together."""
+    """Badge-style cartoon, deep ink-blue backdrop:
+    - backdrop: fixed navy radial gradient (independent of the photo's murky
+      dominant color — dark walls give meaningless palette), soft center glow
+    - ALL holds keep posterized surface detail (L 6 levels, ab 8 levels so
+      hues don't smear) stamped as stickers, slightly lifted so they read
+    - matched route: white outline + modest saturation bump (1.25, not 1.6)
+    - edges: light ink (dark backdrop needs light lines)"""
     h, w = img_rgb.shape[:2]
 
-    # --- gradient backdrop from the wall's dominant color ---
-    small = cv2.resize(img_rgb, (64, 64))
-    dom = np.median(small.reshape(-1, 3), axis=0).astype(float)  # dominant wall color
-    lab_dom = cv2.cvtColor(dom[None, None].astype(np.uint8), cv2.COLOR_RGB2LAB)[0, 0].astype(float)
-    lab_hi = lab_dom.copy()
-    lab_hi[0] = min(88.0, lab_dom[0] + 30)   # brighten center (card feel)
-    lab_hi[1] *= 0.4                          # calm the hue
-    lab_hi[2] *= 0.4
-    lab_deep = lab_dom.copy()
-    lab_deep[0] = max(8.0, lab_dom[0] - 40)  # dark edge
-    lab_deep[1] *= 0.3                        # drop red
-    lab_deep[2] = lab_dom[2] - 30             # shift toward blue (echoes the route)
-    c_dom = cv2.cvtColor(lab_hi[None, None].astype(np.uint8), cv2.COLOR_LAB2RGB)[0, 0]
-    c_deep = cv2.cvtColor(lab_deep[None, None].astype(np.uint8), cv2.COLOR_LAB2RGB)[0, 0]
-
+    # --- fixed navy gradient backdrop ---
+    c_hi = np.array([46, 62, 87])     # #2e3e57 mid navy
+    c_deep = np.array([12, 18, 30])   # #0c121e near-black blue
     yy, xx = np.mgrid[0:h, 0:w]
-    cx, cy = w * 0.5, h * 0.42  # radial center slightly above middle
+    cx, cy = w * 0.5, h * 0.42
     r = np.sqrt(((xx - cx) / (w * 0.75)) ** 2 + ((yy - cy) / (h * 0.75)) ** 2)
     r = np.clip(r, 0, 1)
-    bg = (c_dom[None, None] * (1 - r[..., None]) + c_deep[None, None] * r[..., None])
-    # soft center glow (halo) so the route zone pops
+    bg = (c_hi[None, None] * (1 - r[..., None]) + c_deep[None, None] * r[..., None])
     halo = np.exp(-r * 2.2)[..., None]
-    bg = bg * 0.85 + 255.0 * 0.15 * halo
+    bg = bg * 0.88 + 255.0 * 0.12 * halo
 
-    # --- posterized holds (ALL holds keep surface detail) ---
+    # --- posterized holds (keep surface detail, lift a bit for sticker feel) ---
     lab = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2LAB).astype(np.float32)
 
     def quantize(x, levels):
         return np.round(x * (levels - 1) / 255.0) * (255.0 / (levels - 1))
 
-    lab[..., 0] = quantize(lab[..., 0], 6)   # luminance: keep shading detail
-    lab[..., 1] = quantize(lab[..., 1], 5)   # a: flatten hue
-    lab[..., 2] = quantize(lab[..., 2], 5)   # b: flatten hue
+    lab[..., 0] = np.clip(quantize(lab[..., 0], 6) + 14.0, 0, 255)  # L + lift
+    lab[..., 1] = quantize(lab[..., 1], 8)   # more levels -> no hue smearing
+    lab[..., 2] = quantize(lab[..., 2], 8)
     post = cv2.cvtColor(lab.astype(np.uint8), cv2.COLOR_LAB2RGB).astype(np.float32)
 
     for hld in holds:
-        bg[hld.mask] = post[hld.mask]  # stamp hold detail onto backdrop
+        bg[hld.mask] = post[hld.mask]
 
     out = bg.astype(np.uint8)
 
-    # --- ink edges (Canny) over everything ---
+    # --- light ink edges (dark backdrop needs light lines) ---
     gray = cv2.cvtColor(np.array(img_rgb), cv2.COLOR_RGB2GRAY)
     edges = cv2.Canny(gray, 60, 150)
     edges = cv2.dilate(edges, np.ones((2, 2), np.uint8))
-    out[edges > 0] = (out[edges > 0] * 0.55).astype(np.uint8)
+    out[edges > 0] = np.clip(out[edges > 0].astype(int) * 1.35, 0, 255).astype(np.uint8)
 
-    # --- matched route: saturation boost + white outline ---
+    # --- matched route: lift + double outline (dark under-edge, white top) ---
     for hid in matched_ids:
         hld = next(x for x in holds if x.id == hid)
         ys, xs = np.nonzero(hld.mask)
         px = out[ys, xs].astype(np.float32)
         lab_px = cv2.cvtColor(px[None].astype(np.uint8), cv2.COLOR_RGB2LAB)[0].astype(np.float32)
-        lab_px[..., 1] *= 1.6   # boost a
-        lab_px[..., 2] *= 1.6   # boost b
+        lab_px[..., 0] = np.clip(lab_px[..., 0] * 1.18, 0, 255)  # lift vs navy bg
+        lab_px[..., 1] *= 1.25   # modest bump — heavy boost looked garish
+        lab_px[..., 2] *= 1.25
         out[ys, xs] = cv2.cvtColor(lab_px[None].astype(np.uint8), cv2.COLOR_LAB2RGB)[0]
-        outline(out, hld, (255, 255, 255), 4)
-    return out
-
+        outline(out, hld, (18, 26, 40), 6)    # dark under-edge (sticker shadow)
+        outline(out, hld, (255, 255, 255), 3)  # white top edge
 
 
 def route_order(holds: list[Hold], matched_ids: list[int]) -> list[int]:
