@@ -63,6 +63,7 @@ class Annotator:
 
     def run(self) -> None:
         cv2.namedWindow("CRUX annotate")
+        cv2.setMouseCallback("CRUX annotate", lambda *a: mouse_cb(*a, self))
         self.show()
         while True:
             k = cv2.waitKey(20) & 0xFF
@@ -148,7 +149,6 @@ def mouse_cb(event, x, y, flags, ann: Annotator):
 
 def main(coco_path: Path) -> None:
     ann = Annotator(coco_path)
-    cv2.setMouseCallback("CRUX annotate", lambda *a: mouse_cb(*a, ann))
     ann.run()
     print("done")
 
