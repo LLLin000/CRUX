@@ -1,0 +1,34 @@
+# CRUX CI — GitHub Actions (public repo: macOS runners are free & unlimited).
+# Complements Codemagic (signing/distribution); this workflow is the fast
+# daily gate: iOS app build (simulator) + full SwiftPM test (which compiles
+# the CRUX target for macOS, catching #if os(iOS) regressions).
+
+name: Swift
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    name: iOS build + swift test
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Toolchain
+        run: |
+          swift --version
+          xcodebuild -version
+
+      - name: Build iOS app (simulator, no signing)
+        run: |
+          set -o pipefail
+          xcodebuild -project CRUX.xcodeproj -scheme CRUX \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO build
+
+      - name: SwiftPM tests (compiles CRUX for macOS + CRUXCore tests)
+        run: swift test
