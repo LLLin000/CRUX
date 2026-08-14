@@ -1,0 +1,29 @@
+# CRUX — Codemagic workflow (free tier: 500 min/month macOS M2, no Mac needed)
+# Phase 1 (now): compile SwiftPM package + run XCTest on iOS simulator —
+#   simulator tests need NO Apple Developer account and NO signing.
+# Phase 2 (after $99 purchase): add archive/signing workflow for TestFlight.
+
+workflows:
+  crux-tests:
+    name: CRUX Swift Tests (simulator)
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+    environment:
+      xcode: latest
+      vars:
+        SWIFT_PACKAGE_DIR: app
+    scripts:
+      - name: Build package
+        script: |
+          cd $SWIFT_PACKAGE_DIR
+          xcodebuild -scheme CRUX -destination 'platform=iOS Simulator,name=iPhone 16' build
+      - name: Run unit tests
+        script: |
+          cd $SWIFT_PACKAGE_DIR
+          xcodebuild -scheme CRUX -destination 'platform=iOS Simulator,name=iPhone 16' test
+    artifacts:
+      - $SWIFT_PACKAGE_DIR/.build/**/*.log
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com
