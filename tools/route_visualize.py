@@ -8,7 +8,7 @@ Pipeline: ONNX model detections -> per-hold Lab median -> seed color (blue)
 
 Usage:
     python tools/route_visualize.py --photo data/realpic/66ced02810271ec75cddbac23909f407.jpg \
-        --model output/onnx_640_aug/rfdetr-seg-small-aug.onnx --seed-lab "35 5 -25" --out data/route_viz
+        --model output/onnx_640_aug/crux-hold-seg-v0.3.0-648-fp16.onnx --seed-lab "35 5 -25" --out data/route_viz
 """
 from __future__ import annotations
 
@@ -289,7 +289,7 @@ if __name__ == "__main__":
     ap.add_argument("--photo", type=Path,
                     default=Path("data/realpic/66ced02810271ec75cddbac23909f407.jpg"))
     ap.add_argument("--model", type=Path,
-                    default=Path("output/onnx_640_aug/rfdetr-seg-small-aug.onnx"))
+                    default=Path("output/onnx_640_aug/crux-hold-seg-v0.3.0-648-fp16.onnx"))
     ap.add_argument("--seed-lab", type=str, default="35 5 -25", help="target Lab 'L a b'")
     ap.add_argument("--out", type=Path, default=Path("data/route_viz"))
     ap.add_argument("--label", type=str, default="CRUX", help="badge logo text ('' to skip)")

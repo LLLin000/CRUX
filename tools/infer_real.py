@@ -4,7 +4,7 @@ D1 exploration: how well does the 12-image research checkpoint generalize to
 user's real photos? Produces annotated previews + per-image detection stats.
 
 Usage:
-    python tools/infer_real.py --photos data/realpic --model output/onnx/rfdetr-seg-small.onnx --out data/realpic_out
+    python tools/infer_real.py --photos data/realpic --model output/onnx_640_aug/crux-hold-seg-v0.3.0-648-fp16.onnx --out data/realpic_out
 """
 from __future__ import annotations
 
@@ -194,7 +194,7 @@ def main(photos: Path, model_path: Path, out_dir: Path, tag: str) -> None:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--photos", type=Path, default=Path("data/realpic"))
-    ap.add_argument("--model", type=Path, default=Path("output/onnx/rfdetr-seg-small.onnx"))
+    ap.add_argument("--model", type=Path, default=Path("output/onnx_640_aug/crux-hold-seg-v0.3.0-648-fp16.onnx"))
     ap.add_argument("--out", type=Path, default=Path("data/realpic_out"))
     ap.add_argument("--tag", type=str, default=None,
                     help="output subdir (default: model's parent dir name, e.g. onnx_640_aug)")
