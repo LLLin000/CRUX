@@ -55,9 +55,11 @@ struct RoutesView: View {
             }
             .background(Theme.bg)
             .navigationTitle("路线图鉴")
+            #if os(iOS)
             .navigationDestination(for: ClimbRoute.self) { route in
                 RouteDetailView(route: route)
             }
+            #endif
             .toolbar {
                 ToolbarItemGroup(placement: .primaryAction) {  // topBarTrailing on iOS, primaryAction on macOS
                     #if DEBUG && os(iOS)
