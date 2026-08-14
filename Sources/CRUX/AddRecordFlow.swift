@@ -212,7 +212,7 @@ struct GymSearchView: View {
                 Button {
                     onPick(item.name ?? "未知岩馆",
                            item.placemark.coordinate,
-                           item.identifier)
+                           item.identifier?.rawValue)
                     dismiss()
                 } label: {
                     VStack(alignment: .leading) {
