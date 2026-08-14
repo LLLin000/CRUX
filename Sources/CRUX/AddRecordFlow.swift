@@ -35,6 +35,8 @@ struct AddRecordFlow: View {
     @State private var showCamera = false
     @State private var showGymSearch = false
     @State private var photoItem: PhotosPickerItem?
+    @State private var toastText: String?
+    @State private var toastTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
@@ -125,6 +127,18 @@ struct AddRecordFlow: View {
                     }
                 }
             }
+            .overlay(alignment: .bottom) {
+                if let toastText {
+                    Text(toastText)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(Theme.accentText)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 10)
+                        .background(Theme.accent, in: Capsule())
+                        .padding(.bottom, 24)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
             .preferredColorScheme(.dark)
         }
     }
@@ -156,13 +170,24 @@ struct AddRecordFlow: View {
         route.holds = model.holds
         modelContext.insert(route)
         try? modelContext.save()
-        dismiss()
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        showToast("已保存 ✓")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { dismiss() }
     }
 
-    /// fixOrientation + save canonical JPEG to Documents/Photos (PLAN §4). Color
-    /// space conversion to sRGB happens in M1+ via CIContext workingColorSpace.
+    private func showToast(_ text: String) {
+        toastTask?.cancel()
+        withAnimation(.spring(duration: 0.35)) { toastText = text }
+        toastTask = Task {
+            try? await Task.sleep(for: .seconds(1.4))
+            withAnimation(.easeOut(duration: 0.3)) { toastText = nil }
+        }
+    }
+
+    /// fixOrientation + sRGB + downscale via PhotoCanonicalizer, then save
+    /// canonical JPEG to Documents/Photos (PLAN §4, M1).
     private func saveCanonicalImage(_ image: UIImage) -> String? {
-        guard let data = image.jpegData(compressionQuality: 0.9) else { return nil }
+        guard let data = PhotoCanonicalizer.canonicalJPEG(from: image) else { return nil }
         let dir = URL.documentsDirectory.appending(path: "Photos")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let url = dir.appending(path: "\(UUID().uuidString).jpg")

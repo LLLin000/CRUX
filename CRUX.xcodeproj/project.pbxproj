@@ -16,6 +16,8 @@
 		1B0000000000000000000007 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000017 /* TodayView.swift */; };
 		1B0000000000000000000008 /* RoutesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000018 /* RoutesView.swift */; };
 		1B0000000000000000000009 /* AddRecordFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000019 /* AddRecordFlow.swift */; };
+		1B000000000000000000000A /* PhotoCanonicalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000000000000000000001E /* PhotoCanonicalizer.swift */; };
+		1B000000000000000000000B /* RouteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000000000000000000001F /* RouteDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		1A0000000000000000000017 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		1A0000000000000000000018 /* RoutesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutesView.swift; sourceTree = "<group>"; };
 		1A0000000000000000000019 /* AddRecordFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRecordFlow.swift; sourceTree = "<group>"; };
+		1A000000000000000000001E /* PhotoCanonicalizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCanonicalizer.swift; sourceTree = "<group>"; };
+		1A000000000000000000001F /* RouteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteDetailView.swift; sourceTree = "<group>"; };
 		1A000000000000000000001A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A000000000000000000001B /* CRUX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CRUX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -79,6 +83,8 @@
 				1A0000000000000000000017 /* TodayView.swift */,
 				1A0000000000000000000018 /* RoutesView.swift */,
 				1A0000000000000000000019 /* AddRecordFlow.swift */,
+				1A000000000000000000001E /* PhotoCanonicalizer.swift */,
+				1A000000000000000000001F /* RouteDetailView.swift */,
 			);
 			path = CRUX;
 			sourceTree = "<group>";
@@ -186,6 +192,8 @@
 				1B0000000000000000000007 /* TodayView.swift in Sources */,
 				1B0000000000000000000008 /* RoutesView.swift in Sources */,
 				1B0000000000000000000009 /* AddRecordFlow.swift in Sources */,
+				1B000000000000000000000A /* PhotoCanonicalizer.swift in Sources */,
+				1B000000000000000000000B /* RouteDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
