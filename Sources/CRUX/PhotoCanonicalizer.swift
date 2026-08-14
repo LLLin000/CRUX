@@ -5,10 +5,10 @@
 //  then stored as JPEG. Downstream (Lab sampling, mask rendering, ONNX) can
 //  assume upright sRGB pixels with a bounded size.
 
+#if os(iOS)
 import CoreImage
 import UIKit
 
-#if os(iOS)
 enum PhotoCanonicalizer {
     static let maxEdge: CGFloat = 2048
 
