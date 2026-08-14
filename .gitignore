@@ -1,0 +1,11 @@
+# data and generated artifacts
+data/
+output/
+*.pth
+*.mlpackage
+*.zip
+
+# python
+__pycache__/
+*.pyc
+.venv/
