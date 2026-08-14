@@ -210,9 +210,15 @@ struct GymSearchView: View {
         NavigationStack {
             List(Array(results.enumerated()), id: \.offset) { _, item in
                 Button {
+                    let mapItemID: String?
+                    if #available(iOS 18.0, *) {
+                        mapItemID = item.identifier?.rawValue
+                    } else {
+                        mapItemID = nil  // MKMapItem.identifier is iOS 18+; name+coords still work
+                    }
                     onPick(item.name ?? "未知岩馆",
                            item.placemark.coordinate,
-                           item.identifier?.rawValue)
+                           mapItemID)
                     dismiss()
                 } label: {
                     VStack(alignment: .leading) {
