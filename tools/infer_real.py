@@ -29,13 +29,15 @@ def preprocess(pil: Image.Image) -> np.ndarray:
 
 
 def decode(out: list[np.ndarray], orig_w: int, orig_h: int):
+    """RF-DETR ONNX outputs: dets = cxcywh normalized to the 384x384 STRETCHED
+    input (infer_transforms does direct resize, NOT letterbox — verified by
+    column-0 alignment). Map back with per-axis scale, no pad."""
     dets, labels, masks = out
-    dets = dets[0]          # (100, 4) cxcywh, normalized to letterbox square
+    dets = dets[0]          # (100, 4) cxcywh, normalized to stretched 384x384
     labels = labels[0]      # (100, 3) logits: [obj, cls0, cls1]
     masks = masks[0]        # (100, 96, 96) logits
-    scale = RESOLUTION / max(orig_w, orig_h)
-    pad_x = (RESOLUTION - orig_w * scale) / 2
-    pad_y = (RESOLUTION - orig_h * scale) / 2
+    sx = orig_w / RESOLUTION   # stretched x scale (w/384)
+    sy = orig_h / RESOLUTION   # stretched y scale (h/384)
 
     boxes, confs, cls_ids, mask_list = [], [], [], []
     for i in range(dets.shape[0]):
@@ -44,20 +46,14 @@ def decode(out: list[np.ndarray], orig_w: int, orig_h: int):
         if conf < CONF:
             continue
         cx, cy, w, h = dets[i]
-        # cxcywh normalized -> xyxy in letterbox pixel space
-        x1 = (cx - w / 2) * RESOLUTION
-        y1 = (cy - h / 2) * RESOLUTION
-        x2 = (cx + w / 2) * RESOLUTION
-        y2 = (cy + h / 2) * RESOLUTION
-        # letterbox -> original coords
-        x1 = (x1 - pad_x) / scale
-        y1 = (y1 - pad_y) / scale
-        x2 = (x2 - pad_x) / scale
-        y2 = (y2 - pad_y) / scale
+        # cxcywh normalized -> xyxy in ORIGINAL image pixels (per-axis scale)
+        x1 = (cx - w / 2) * orig_w
+        y1 = (cy - h / 2) * orig_h
+        x2 = (cx + w / 2) * orig_w
+        y2 = (cy + h / 2) * orig_h
         m = 1 / (1 + np.exp(-masks[i]))  # sigmoid
         m = cv2.resize(m, (RESOLUTION, RESOLUTION), interpolation=cv2.INTER_LINEAR)
-        m = m[int(pad_y):int(pad_y + orig_h * scale), int(pad_x):int(pad_x + orig_w * scale)]
-        m = cv2.resize(m, (orig_w, orig_h), interpolation=cv2.INTER_LINEAR)
+        m = cv2.resize(m, (orig_w, orig_h), interpolation=cv2.INTER_LINEAR)  # stretch back
         boxes.append([x1, y1, x2, y2])
         confs.append(conf)
         cls_ids.append(cls)
