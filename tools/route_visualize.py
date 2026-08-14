@@ -125,12 +125,18 @@ def main(photo: Path, model_path: Path, seed_lab: np.ndarray, out_dir: Path) -> 
 
 def outline(img: np.ndarray, hold: Hold, color, thickness: int) -> None:
     """Smooth outline via the shared edge-preserving two-stage RDP polygon
-    (same path as pre-annotations) — never the raw raster mask edge."""
-    poly = mask_to_polygon(hold.mask)
+    (same path as pre-annotations) — never the raw raster mask edge.
+    reject_straight=False: long bar holds are real holds, keep polyline style.
+    Fallback (degenerate mask) also approximates instead of pixel-drawing."""
+    poly = mask_to_polygon(hold.mask, reject_straight=False)
     if poly is None:
         m = (hold.mask * 255).astype(np.uint8)
         contours, _ = cv2.findContours(m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        cv2.drawContours(img, contours, -1, color, thickness)
+        if not contours:
+            return
+        best = max(contours, key=cv2.contourArea)
+        pts = cv2.approxPolyDP(best, 2.0, True).reshape(-1, 2)
+        cv2.polylines(img, [pts], True, color, thickness, cv2.LINE_AA)
         return
     pts = np.array(poly[0]).reshape(-1, 2).astype(np.int32)
     cv2.polylines(img, [pts], True, color, thickness, cv2.LINE_AA)
@@ -168,7 +174,7 @@ def cartoon(img_rgb: np.ndarray, holds: list[Hold], matched_ids: list[int]) -> n
     all_holds = np.zeros((h, w), bool)
     for hld in holds:
         all_holds |= hld.mask
-    ink = edges & ~all_holds
+    ink = (edges & ~all_holds).astype(bool)  # bool mask, NOT 0/1 int indexing
     out[ink] = np.clip(out[ink].astype(int) * 1.35, 0, 255).astype(np.uint8)
 
     # --- matched route: outline only, colors untouched ---

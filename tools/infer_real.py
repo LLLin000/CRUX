@@ -97,11 +97,12 @@ EPSILON = 1.5      # polygon simplification (px)
 
 
 def mask_to_polygon(mask: np.ndarray, corner_window: int = 9,
-                    corner_angle_deg: float = 30.0):
+                    corner_angle_deg: float = 30.0, reject_straight: bool = True):
     """Mask -> edge-preserving polygon (pre-annotation friendly), two-stage:
     coarse RDP to drop raster steps, then corner-aware per-segment RDP so
-    angles survive. Filter near-straight polygons (wall cracks/texture FP).
-    """
+    angles survive. Optionally filter near-straight polygons (wall cracks/
+    texture FP — pre-annotation only; visualization passes False so long bar
+    holds/volumes keep a clean polyline outline instead of raw mask pixels)."""
     m = (mask > 0.5).astype(np.float32)
     m = cv2.GaussianBlur(m, (3, 3), 0)
     m = (m > 0.5).astype(np.uint8)
@@ -152,7 +153,9 @@ def mask_to_polygon(mask: np.ndarray, corner_window: int = 9,
 
     # Author-inspired filter (xiaoxiae std/utils.py): holds are never near-straight
     # lines — a near-linear polygon is a wall crack/edge/texture false positive.
-    if len(poly) >= 4:
+    # Only for pre-annotation (reject_straight=True); visualization wants these
+    # (long bar holds) drawn as clean polylines.
+    if reject_straight and len(poly) >= 4:
         xs, ys = poly[:, 0], poly[:, 1]
         slope, intercept = np.polyfit(xs, ys, 1)
         err = float(np.mean((slope * xs + intercept - ys) ** 2))
