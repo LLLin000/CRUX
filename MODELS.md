@@ -8,8 +8,8 @@
 
 | 版本 | 训练数据 | 分辨率 | 增强 | val mAP_50_95 | ONNX 文件 | 状态 |
 |---|---|---|---|---|---|---|
-| v0.1.0 | Kaggle bh (12 train) | 384 | 无 | ~0.29 | `output/onnx/crux-hold-seg-v0.1.0-384-fp16.onnx` | baseline（弃用） |
-| v0.2.0 | Kaggle bh (12 train) | 640 | 无 | ~0.29 | `output/onnx_640/crux-hold-seg-v0.2.0-648-fp16.onnx` | 细掩码验证 |
+| v0.1.0 | Kaggle bh (12 train) | 384 | 无 | ~0.29 | ~~`output/onnx/...`~~ | baseline（**已清理**） |
+| v0.2.0 | Kaggle bh (12 train) | 640 | 无 | ~0.29 | ~~`output/onnx_640/...`~~ | 细掩码验证（**已清理**） |
 | **v0.3.0** | Kaggle bh (12 train) | 640 | AUG_CONSERVATIVE, 130ep | **0.276** | `output/onnx_640_aug/crux-hold-seg-v0.3.0-648-fp16.onnx` | **当前默认** |
 | v0.3.0-fp32 | 同上 | 640 | 同上 | 同上 | `output/onnx_640_aug_fp32/crux-hold-seg-v0.3.0-648-fp32.onnx` | INT8 量化源 |
 
@@ -17,7 +17,7 @@
 
 | 版本 | ckpt 目录 | research pth |
 |---|---|---|
-| v0.1.0 | `output/rfdetr_seg_small/` | `crux-hold-seg-research.pth` |
+| v0.1.0/v0.2.0 | ~~`output/rfdetr_seg_small/`~~（已清理） | — |
 | v0.3.0 | `output/rfdetr_seg_small_aug/` | `crux-hold-seg-research.pth` |
 
 ## 已知限制（v0.x 系列）
