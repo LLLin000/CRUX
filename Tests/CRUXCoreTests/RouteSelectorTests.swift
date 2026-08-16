@@ -54,6 +54,50 @@ final class RouteSelectorTests: XCTestCase {
         let picked = selector.select(seedIndex: 0, holds: holds, labs: labs)
         XCTAssertEqual(picked, [0, 1, 2], "route blues only; stray blue + reds excluded, got \(picked)")
     }
+    func testSeedSelectsNonContiguousCandidatesUsingGlobalIndices() {
+        let w = 300, h = 300
+        var pixels: [Int: (r: Double, g: Double, b: Double)] = [:]
+        let blue: (Double, Double, Double) = (40, 110, 235)
+        let red: (Double, Double, Double) = (220, 60, 50)
+
+        func paint(_ x: Int, _ y: Int, _ color: (Double, Double, Double)) {
+            for dy in -12...12 where y + dy >= 0 && y + dy < h {
+                for dx in -12...12 where x + dx >= 0 && x + dx < w {
+                    pixels[(x + dx) * h + (y + dy)] = color
+                }
+            }
+        }
+        func fullMaskRLE() -> Data {
+            let counts = [Int32(0), Int32(24 * 24)]
+            return counts.withUnsafeBytes { Data($0) }
+        }
+        func geometry(_ x: Int, _ y: Int) -> HoldGeometry {
+            let bw = 24.0 / Double(w), bh = 24.0 / Double(h)
+            return HoldGeometry(
+                bboxX: Double(x) / Double(w) - bw / 2,
+                bboxY: Double(y) / Double(h) - bh / 2,
+                bboxWidth: bw, bboxHeight: bh,
+                maskWidth: 24, maskHeight: 24, maskRLE: fullMaskRLE()
+            )
+        }
+
+        let centers = [(20, 20, red), (60, 60, blue), (100, 20, red),
+                       (100, 60, blue), (140, 20, red), (140, 60, blue),
+                       (180, 20, red), (260, 260, blue)]
+        for (x, y, color) in centers { paint(x, y, color) }
+        let holds = centers.map { geometry($0.0, $0.1) }
+        let labs = SeededRouteSelector.medianLabPerHold(
+            holds: holds,
+            imagePixels: { x, y in pixels[x * h + y] },
+            imageWidth: w, imageHeight: h
+        )
+
+        let selector = SeededRouteSelector()
+        let picked = selector.select(seedIndex: 5, holds: holds, labs: labs)
+        XCTAssertEqual(picked, [1, 3, 5],
+                       "candidate-local DBSCAN indices must map back to global hold indices")
+    }
+
 
     func testMedianLabOfKnownColor() {
         // A uniform blue block must produce its exact Lab median.

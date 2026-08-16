@@ -57,15 +57,18 @@ struct SeededRouteSelector {
                                  labs[i].l, labs[i].a, labs[i].b) < deltaEThreshold
         }
         guard candidates.count > 1 else { return candidates.isEmpty ? [] : [seedIndex] }
-
-        // DBSCAN on candidate centroids (eps = factor × median diameter)
         let diams = holds.map { h in max(h.bboxWidth, h.bboxHeight) }
         let medianDiam = diams.sorted()[diams.count / 2]
         let eps = dbscanEpsFactor * medianDiam
+
+        // DBSCAN indexes the compact candidate list, not the original holds.
         let clusters = dbscan(points: candidates.map { holds[$0].centroid },
                               eps: eps, minSamples: minSamples)
-        guard let seedCluster = clusters[seedIndex] else { return [seedIndex] }
-        return Set(candidates.filter { clusters[$0] == seedCluster })
+        guard let seedLocalIndex = candidates.firstIndex(of: seedIndex),
+              let seedCluster = clusters[seedLocalIndex] else { return [seedIndex] }
+        return Set(candidates.enumerated().compactMap { localIndex, globalIndex in
+            clusters[localIndex] == seedCluster ? globalIndex : nil
+        })
     }
 
     // MARK: mask sampling (bbox-local raster -> canonical image pixel coords)
