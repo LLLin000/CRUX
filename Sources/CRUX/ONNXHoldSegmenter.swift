@@ -215,6 +215,11 @@ public actor ONNXHoldSegmenter: HoldSegmenter {
         }
     }
 
+    private static func sigmoid(_ value: Float) -> Double {
+        let clamped = max(-60, min(60, Double(value)))
+        return 1 / (1 + exp(-clamped))
+    }
+
 
 }
 #endif
