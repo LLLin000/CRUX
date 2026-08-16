@@ -348,8 +348,8 @@ struct HoldOverlayPhoto: View {
             let fitted = Self.fittedRect(photoSize: photo.size, in: geo.size)
             ZStack {
                 Image(uiImage: photo).resizable().scaledToFit()
-                if let draft, let analysis = draft.analysis {
-                    ForEach(analysis.holds) { hold in
+                if let draft {
+                    ForEach(draft.analysis.holds) { hold in
                         let centroid = hold.detection.geometry.centroid
                         let selected = draft.selectedHoldIDs.contains(hold.id)
                         Circle()
