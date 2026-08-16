@@ -3,7 +3,7 @@ import CoreGraphics
 import Foundation
 import ImageIO
 import CRUXCore
-import onnxruntime
+import OnnxRuntimeBindings
 
 /// ONNX Runtime adapter for the exported RF-DETR-Seg model.
 /// Tensor names and model-space decoding stay inside the client boundary.
