@@ -167,8 +167,8 @@ public actor ONNXHoldSegmenter: HoldSegmenter {
             let y2 = max(0, min(1, centerY + rawHeight / 2))
             guard x2 > x1, y2 > y1 else { continue }
 
-            let maskWidth = max(1, min(128, Int((x2 - x1) * Double(imageWidth)).rounded()))
-            let maskHeight = max(1, min(128, Int((y2 - y1) * Double(imageHeight)).rounded()))
+            let maskWidth = max(1, min(128, Int(((x2 - x1) * Double(imageWidth)).rounded())))
+            let maskHeight = max(1, min(128, Int(((y2 - y1) * Double(imageHeight)).rounded())))
             let maskOffset = query * maskSize * maskSize
             let maskRLE = encodeMask(
                 logits: masks,
@@ -208,7 +208,8 @@ public actor ONNXHoldSegmenter: HoldSegmenter {
 
     private static func floats(from value: ORTValue) throws -> [Float] {
         let data = try value.tensorData()
-        return data.withUnsafeBytes { rawBuffer in
+        let rawData = Data(bytes: data.bytes, count: data.length)
+        return rawData.withUnsafeBytes { rawBuffer in
             Array(rawBuffer.bindMemory(to: Float.self))
         }
     }
