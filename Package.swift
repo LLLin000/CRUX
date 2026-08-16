@@ -9,13 +9,27 @@ var targets: [Target] = [
     .target(name: "CRUXCore", path: "Sources/CRUXCore"),
     .testTarget(name: "CRUXCoreTests", dependencies: ["CRUXCore"], path: "Tests/CRUXCoreTests"),
 ]
+var dependencies: [Package.Dependency] = []
 
 #if !os(Windows)
+dependencies.append(
+    .package(
+        url: "https://github.com/microsoft/onnxruntime-swift-package-manager",
+        from: "1.19.2"
+    )
+)
 products.insert(.library(name: "CRUXClient", targets: ["CRUXClient"]), at: 0)
 targets.insert(
     // iOS client UI: SwiftUI/UIKit/SwiftData. The Xcode app target is
     // still named CRUX; this package target makes the Client/Core split explicit.
-    .target(name: "CRUXClient", dependencies: ["CRUXCore"], path: "Sources/CRUX"),
+    .target(
+        name: "CRUXClient",
+        dependencies: [
+            "CRUXCore",
+            .product(name: "onnxruntime", package: "onnxruntime-swift-package-manager"),
+        ],
+        path: "Sources/CRUX"
+    ),
     at: 0
 )
 #endif
@@ -24,5 +38,6 @@ let package = Package(
     name: "CRUX",
     platforms: [.iOS(.v17), .macOS(.v14)],
     products: products,
+    dependencies: dependencies,
     targets: targets
 )

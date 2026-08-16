@@ -7,6 +7,7 @@ import Foundation
 
 
 public struct SeededRouteSelector {
+    public static let version = "seeded-deltaE-dbscan-v1"
     public let deltaEThreshold: Double   // initial heuristic ~5–10, calibrate in D1
     public let dbscanEpsFactor: Double   // × median hold diameter (2.5 verified in prototype)
     public let minSamples: Int           // 2 = noise rejection; 1 ≡ connected components
@@ -43,7 +44,7 @@ public struct SeededRouteSelector {
     /// Select the group containing the seed (by index into `holds`).
     public func select(seedIndex: Int, holds: [HoldGeometry],
                        labs: [LabColor]) -> Set<Int> {
-        guard holds.indices.contains(seedIndex) else { return [] }
+        guard holds.indices.contains(seedIndex), labs.count == holds.count else { return [] }
         let seedLab = labs[seedIndex]
         let candidates = holds.indices.filter { i in
             ColorMath.deltaE2000(seedLab.l, seedLab.a, seedLab.b,
