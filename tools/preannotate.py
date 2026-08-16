@@ -69,7 +69,7 @@ if __name__ == "__main__":
     ap.add_argument("--model", type=Path, default=Path("output/onnx_v101/crux-hold-seg-v1.0.1-648-fp16.onnx"))
     ap.add_argument("--out", type=Path, default=Path("data/preannotations"))
     ap.add_argument("--tag", type=str, default=None,
-                    help="output subdir (default: model's parent dir name, e.g. onnx_640_aug)")
+                    help="output subdir (default: model's parent dir name, e.g. onnx_v101)")
     args = ap.parse_args()
     tag = args.tag or args.model.parent.name
     main(args.photos, args.model, args.out, tag)

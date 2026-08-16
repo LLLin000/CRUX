@@ -6,7 +6,7 @@ regions the annotator can edit/delete.
 
 Usage:
     python tools/coco_to_labelstudio.py \
-        --coco data/preannotations/onnx_640_aug/preannotations.json \
+        --coco data/preannotations/onnx_v101/preannotations.json \
         --out data/preannotations/labelstudio_tasks.json
 """
 from __future__ import annotations
@@ -60,7 +60,7 @@ def main(coco_path: Path, out_path: Path) -> None:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--coco", type=Path,
-                    default=Path("data/preannotations/onnx_640_aug/preannotations.json"))
+                    default=Path("data/preannotations/onnx_v101/preannotations.json"))
     ap.add_argument("--out", type=Path,
                     default=Path("data/preannotations/labelstudio_tasks.json"))
     args = ap.parse_args()

@@ -1,13 +1,17 @@
-"""Quantize a CRUX ONNX model to INT8 (static, QDQ) with calibration.
+"""Quantize a CRUX ONNX model to INT8.
 
-FP32 source -> INT8 (~4x smaller). Calibration runs the FP32 model over
-representative images (train set) collecting activation ranges.
+Default mode is static QDQ with calibrated activations. ``--dynamic`` uses
+weight-only INT8 and keeps activations in FP32 for better output stability.
+The default calibration directory is the pure Kaggle research train split;
+never calibrate from ``test2017`` when measuring the realpic correction set.
 
 Usage:
     python tools/quantize_onnx.py \
         --model output/onnx_v101/crux-hold-seg-v1.0.1-648-fp32.onnx \
         --out output/onnx_v101/crux-hold-seg-v1.0.1-648-int8.onnx \
         --calib data/crux-dataset/train2017 --resolution 648
+
+    python tools/quantize_onnx.py ... --dynamic --reduce-range
 """
 from __future__ import annotations
 
@@ -46,23 +50,34 @@ class CalibReader:
         return self
 
 
-def main(model_path: Path, out_path: Path, calib_dir: Path, resolution: int) -> None:
-    from onnxruntime.quantization import QuantFormat, QuantType, quantize_static
+def main(model_path: Path, out_path: Path, calib_dir: Path, resolution: int,
+         dynamic: bool, reduce_range: bool) -> None:
+    from onnxruntime.quantization import QuantType, quantize_dynamic, quantize_static
     import onnxruntime as ort
 
-    sess = ort.InferenceSession(str(model_path), providers=["CPUExecutionProvider"])
-    input_name = sess.get_inputs()[0].name
+    if dynamic:
+        quantize_dynamic(
+            str(model_path), str(out_path),
+            per_channel=True,
+            reduce_range=reduce_range,
+            weight_type=QuantType.QInt8,
+        )
+    else:
+        from onnxruntime.quantization import QuantFormat
 
-    reader = CalibReader(calib_dir, input_name, resolution)
-    quantize_static(
-        str(model_path), str(out_path), reader,
-        quant_format=QuantFormat.QDQ,
-        per_channel=True,
-        weight_type=QuantType.QInt8,
-        activation_type=QuantType.QUInt8,
-        extra_options={"MinimumRealRange": 0.0001},
-    )
-    print(f"quantized: {out_path}")
+        sess = ort.InferenceSession(str(model_path), providers=["CPUExecutionProvider"])
+        input_name = sess.get_inputs()[0].name
+        reader = CalibReader(calib_dir, input_name, resolution)
+        quantize_static(
+            str(model_path), str(out_path), reader,
+            quant_format=QuantFormat.QDQ,
+            per_channel=True,
+            reduce_range=reduce_range,
+            weight_type=QuantType.QInt8,
+            activation_type=QuantType.QUInt8,
+            extra_options={"MinimumRealRange": 0.0001},
+        )
+    print(f"quantized ({'dynamic' if dynamic else 'static'}): {out_path}")
 
     # sanity: input shape + size
     s2 = ort.InferenceSession(str(out_path), providers=["CPUExecutionProvider"])
@@ -75,7 +90,13 @@ if __name__ == "__main__":
     ap.add_argument("--model", type=Path, required=True, help="FP32 ONNX")
     ap.add_argument("--out", type=Path, required=True, help="INT8 output path")
     ap.add_argument("--calib", type=Path,
-                    default=Path("data/crux-dataset/train2017"))
+                    default=Path("data/crux-dataset/train2017"),
+                    help="pure research train images; excludes realpic test2017")
     ap.add_argument("--resolution", type=int, default=648)
+    ap.add_argument("--dynamic", action="store_true",
+                    help="weight-only INT8; keeps activations in FP32 (no calibration)")
+    ap.add_argument("--reduce-range", action="store_true",
+                    help="use 7-bit activation range; safer on x86 CPUs")
     args = ap.parse_args()
-    main(args.model, args.out, args.calib, args.resolution)
+    main(args.model, args.out, args.calib, args.resolution,
+         args.dynamic, args.reduce_range)

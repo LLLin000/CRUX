@@ -9,7 +9,7 @@ polygons overlaid, and lets a human correct them:
   Q / Esc        -> quit (saves)
 
 Usage:
-    python tools/annotate.py --coco data/preannotations/onnx_640_aug/preannotations.json
+    python tools/annotate.py --coco data/preannotations/onnx_v101/preannotations.json
 """
 from __future__ import annotations
 
@@ -159,6 +159,6 @@ def main(coco_path: Path) -> None:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--coco", type=Path,
-                    default=Path("data/preannotations/onnx_640_aug/preannotations.json"))
+                    default=Path("data/preannotations/onnx_v101/preannotations.json"))
     args = ap.parse_args()
     main(args.coco)

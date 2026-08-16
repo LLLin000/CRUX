@@ -46,7 +46,7 @@ def decode(out: list[np.ndarray], orig_w: int, orig_h: int, res: int):
 
     boxes, confs, cls_ids, mask_list = [], [], [], []
     for i in range(dets.shape[0]):
-        conf = float(1 / (1 + np.exp(-labels[i][0])))  # obj logit -> sigmoid
+        conf = float(1 / (1 + np.exp(-np.clip(labels[i][0], -60, 60))))  # obj logit -> sigmoid
         cls = 1 if labels[i][2] > labels[i][1] else 0  # argmax of class logits
         cx, cy, w, h = dets[i]
         thr = CONF_LARGE if (w * h) >= LARGE_AREA else CONF
@@ -57,9 +57,18 @@ def decode(out: list[np.ndarray], orig_w: int, orig_h: int, res: int):
         y1 = (cy - h / 2) * orig_h
         x2 = (cx + w / 2) * orig_w
         y2 = (cy + h / 2) * orig_h
-        m = 1 / (1 + np.exp(-masks[i]))  # sigmoid
+        m = 1 / (1 + np.exp(-np.clip(masks[i], -60, 60)))  # sigmoid
         m = cv2.resize(m, (res, res), interpolation=cv2.INTER_LINEAR)
         m = cv2.resize(m, (orig_w, orig_h), interpolation=cv2.INTER_LINEAR)  # stretch back
+        # A query's instance mask must stay inside its detection box.  Clipping
+        # removes quantization spill into neighboring wall/holds and keeps Lab
+        # sampling and route grouping tied to the detected instance.
+        bx1, by1 = max(0, int(np.floor(x1))), max(0, int(np.floor(y1)))
+        bx2, by2 = min(orig_w, int(np.ceil(x2))), min(orig_h, int(np.ceil(y2)))
+        clipped = np.zeros_like(m)
+        if bx2 > bx1 and by2 > by1:
+            clipped[by1:by2, bx1:bx2] = m[by1:by2, bx1:bx2]
+        m = clipped
         boxes.append([x1, y1, x2, y2])
         confs.append(conf)
         cls_ids.append(cls)
@@ -197,7 +206,7 @@ if __name__ == "__main__":
     ap.add_argument("--model", type=Path, default=Path("output/onnx_v101/crux-hold-seg-v1.0.1-648-fp16.onnx"))
     ap.add_argument("--out", type=Path, default=Path("data/realpic_out"))
     ap.add_argument("--tag", type=str, default=None,
-                    help="output subdir (default: model's parent dir name, e.g. onnx_640_aug)")
+                    help="output subdir (default: model's parent dir name, e.g. onnx_v101)")
     args = ap.parse_args()
     tag = args.tag or args.model.parent.name
     main(args.photos, args.model, args.out, tag)
