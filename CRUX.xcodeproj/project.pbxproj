@@ -150,7 +150,7 @@
 				Base,
 			);
 			packageReferences = (
-				EAD944E593E1C220A10CE268 /* XCLocalSwiftPackageReference ".." */,
+				EAD944E593E1C220A10CE268 /* XCLocalSwiftPackageReference "." */,
 			);
 			mainGroup = 1A0000000000000000000007;
 			productRefGroup = 1A000000000000000000000A /* Products */;
@@ -308,16 +308,16 @@
 		};
 /* End XCConfigurationList section */
 /* Begin XCLocalSwiftPackageReference section */
-		EAD944E593E1C220A10CE268 /* XCLocalSwiftPackageReference ".." */ = {
+		EAD944E593E1C220A10CE268 /* XCLocalSwiftPackageReference "." */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ..;
+			relativePath = .;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		23D64598A1F95B07F42CF254 /* CRUXCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = EAD944E593E1C220A10CE268 /* XCLocalSwiftPackageReference ".." */;
+			package = EAD944E593E1C220A10CE268 /* XCLocalSwiftPackageReference "." */;
 			productName = CRUXCore;
 		};
 /* End XCSwiftPackageProductDependency section */
