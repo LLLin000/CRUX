@@ -36,7 +36,8 @@ CLASS_NAMES = ["hold", "volume"]
 
 def main(fast_dev_run: bool, batch_size: int, num_workers: int, resume: str | None,
          resolution: int = RESOLUTION, multi_scale: bool = True, epochs: int = 100,
-         output_dir: str = "output/rfdetr_seg_small") -> None:
+         output_dir: str = "output/rfdetr_seg_small", lr: float | None = None,
+         dataset: str = str(DATASET_DIR)) -> None:
     global OUTPUT_DIR, FINAL_CKPT
     OUTPUT_DIR = Path(output_dir)
     FINAL_CKPT = OUTPUT_DIR / "crux-hold-seg-research.pth"
@@ -45,8 +46,9 @@ def main(fast_dev_run: bool, batch_size: int, num_workers: int, resume: str | No
     variant.model_config.model_name = type(variant).__name__
 
     train_config = SegmentationTrainConfig(
+        lr=lr if lr is not None else 1e-4,
         dataset_file="coco",                       # local COCO, Roboflow layout
-        dataset_dir=str(DATASET_DIR),
+        dataset_dir=dataset,
         output_dir=str(OUTPUT_DIR),
         epochs=epochs,
         batch_size=batch_size,
@@ -110,8 +112,12 @@ if __name__ == "__main__":
     ap.add_argument("--multi-scale", dest="multi_scale", action="store_true", default=True,
                     help="multi-scale training (default on; author-match)")
     ap.add_argument("--no-multi-scale", dest="multi_scale", action="store_false")
+    ap.add_argument("--lr", type=float, default=None,
+                    help="override learning rate (correction fine-tune: ~1e-5)")
+    ap.add_argument("--dataset", type=str, default=str(DATASET_DIR),
+                    help="COCO dataset dir (e.g. data/crux-dataset-v101 for weighted realpic)")
     args = ap.parse_args()
     epochs = args.epochs if args.epochs else (2 if args.fast_dev_run else 100)
     main(args.fast_dev_run, args.batch_size, args.num_workers, args.resume,
          resolution=args.resolution, multi_scale=args.multi_scale, epochs=epochs,
-         output_dir=args.output_dir)
+         output_dir=args.output_dir, lr=args.lr, dataset=args.dataset)
