@@ -1,0 +1,1 @@
+{"imageWidth":200,"imageHeight":150,"holds":[{"bboxX":0.1,"bboxY":0.2,"bboxW":0.3,"bboxH":0.2,"maskW":60,"maskH":30,"rle":[0,1800],"lab":{"l":47.368876,"a":68.670887,"b":45.334297}},{"bboxX":0.6,"bboxY":0.4,"bboxW":0.25,"bboxH":0.3,"maskW":50,"maskH":45,"rle":[0,2250],"lab":{"l":50.539084,"a":11.405868,"b":-58.11834}}]}
