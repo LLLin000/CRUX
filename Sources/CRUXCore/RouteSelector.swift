@@ -5,51 +5,44 @@
 
 import Foundation
 
-struct HoldGeometry {
-    /// bbox-local raster mask; coordinates are canonical normalized (PLAN §4)
-    let bboxX: Double, bboxY: Double, bboxWidth: Double, bboxHeight: Double
-    let maskWidth: Int, maskHeight: Int
-    let maskRLE: Data
 
-    var centroid: (x: Double, y: Double) {
-        (bboxX + bboxWidth / 2, bboxY + bboxHeight / 2)
-    }
-}
+public struct SeededRouteSelector {
+    public let deltaEThreshold: Double   // initial heuristic ~5–10, calibrate in D1
+    public let dbscanEpsFactor: Double   // × median hold diameter (2.5 verified in prototype)
+    public let minSamples: Int           // 2 = noise rejection; 1 ≡ connected components
 
-struct SeededRouteSelector {
-    let deltaEThreshold: Double   // initial heuristic ~5–10, calibrate in D1
-    let dbscanEpsFactor: Double   // × median hold diameter (2.5 verified in prototype)
-    let minSamples: Int           // 2 = noise rejection; 1 ≡ connected components
-
-    init(deltaEThreshold: Double = 8.0,
-         dbscanEpsFactor: Double = 2.5,
-         minSamples: Int = 2) {
+    public init(deltaEThreshold: Double = 8.0,
+                dbscanEpsFactor: Double = 2.5,
+                minSamples: Int = 2) {
         self.deltaEThreshold = deltaEThreshold
         self.dbscanEpsFactor = dbscanEpsFactor
         self.minSamples = minSamples
     }
 
     /// Median Lab per hold from the canonical sRGB image pixels inside each mask.
-    static func medianLabPerHold(holds: [HoldGeometry],
-                                 imagePixels: (Int, Int) -> (r: Double, g: Double, b: Double)?,
-                                 imageWidth: Int, imageHeight: Int) -> [(l: Double, a: Double, b: Double)] {
+    public static func medianLabPerHold(
+        holds: [HoldGeometry],
+        imagePixels: (Int, Int) -> (r: Double, g: Double, b: Double)?,
+        imageWidth: Int,
+        imageHeight: Int
+    ) -> [LabColor] {
         holds.map { h in
             let labs = sampleMask(h, pixels: imagePixels, w: imageWidth, hgt: imageHeight)
                 .map { ColorMath.srgbToLab($0.r, $0.g, $0.b) }
-            guard !labs.isEmpty else { return (50, 0, 0) }
+            guard !labs.isEmpty else { return LabColor(l: 50, a: 0, b: 0) }
             // median of each channel (mask pixels are spatially independent)
             let sorted = { (keyPath: KeyPath<(l: Double, a: Double, b: Double), Double>) -> Double in
                 let v = labs.map { $0[keyPath: keyPath] }.sorted()
                 let mid = v.count / 2
                 return v.count % 2 == 1 ? v[mid] : (v[mid - 1] + v[mid]) / 2
             }
-            return (sorted(\.l), sorted(\.a), sorted(\.b))
+            return LabColor(l: sorted(\.l), a: sorted(\.a), b: sorted(\.b))
         }
     }
 
     /// Select the group containing the seed (by index into `holds`).
-    func select(seedIndex: Int, holds: [HoldGeometry],
-                labs: [(l: Double, a: Double, b: Double)]) -> Set<Int> {
+    public func select(seedIndex: Int, holds: [HoldGeometry],
+                       labs: [LabColor]) -> Set<Int> {
         guard holds.indices.contains(seedIndex) else { return [] }
         let seedLab = labs[seedIndex]
         let candidates = holds.indices.filter { i in
