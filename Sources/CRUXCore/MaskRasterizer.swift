@@ -100,14 +100,19 @@ public enum MaskRasterizer {
         let y1 = y0 + 1
         let wx = Float(x - Double(x0))
         let wy = Float(y - Double(y0))
-        let p00 = logits[offset + clamped(y0, size) * size + clamped(x0, size)]
-        let p01 = logits[offset + clamped(y0, size) * size + clamped(x1, size)]
-        let p10 = logits[offset + clamped(y1, size) * size + clamped(x0, size)]
-        let p11 = logits[offset + clamped(y1, size) * size + clamped(x1, size)]
+        // Python reference sigmoids the mask first, then resizes (cv2):
+        // interpolate sigmoid(logit) values, never sigmoid(interpolated).
+        let v00 = logits[offset + clamped(y0, size) * size + clamped(x0, size)]
+        let v01 = logits[offset + clamped(y0, size) * size + clamped(x1, size)]
+        let v10 = logits[offset + clamped(y1, size) * size + clamped(x0, size)]
+        let v11 = logits[offset + clamped(y1, size) * size + clamped(x1, size)]
+        let p00 = applySigmoid ? sigmoid(v00) : v00
+        let p01 = applySigmoid ? sigmoid(v01) : v01
+        let p10 = applySigmoid ? sigmoid(v10) : v10
+        let p11 = applySigmoid ? sigmoid(v11) : v11
         let top = p00 + (p01 - p00) * wx
         let bottom = p10 + (p11 - p10) * wx
-        let value = top + (bottom - top) * wy
-        return applySigmoid ? sigmoid(value) : value
+        return top + (bottom - top) * wy
     }
 
     private static func sampleBilinear(
