@@ -10,8 +10,19 @@
 |---|---|---|---|---|---|---|
 | v0.1.0 | Kaggle bh (12 train) | 384 | 无 | ~0.29 | ~~`output/onnx/...`~~ | baseline（**已清理**） |
 | v0.2.0 | Kaggle bh (12 train) | 640 | 无 | ~0.29 | ~~`output/onnx_640/...`~~ | 细掩码验证（**已清理**） |
-| **v0.3.0** | Kaggle bh (12 train) | 640 | AUG_CONSERVATIVE, 130ep | **0.276** | `output/onnx_640_aug/crux-hold-seg-v0.3.0-648-fp16.onnx` | **当前默认** |
+| **v0.3.0** | Kaggle bh (12 train) | 640 | AUG_CONSERVATIVE, 130ep | **0.276** | `output/onnx_640_aug/crux-hold-seg-v0.3.0-648-fp16.onnx` | 上代默认 |
 | v0.3.0-fp32 | 同上 | 640 | 同上 | 同上 | `output/onnx_640_aug_fp32/crux-hold-seg-v0.3.0-648-fp32.onnx` | INT8 量化源 |
+| **v1.0.1** | Kaggle 12 + realpic 7 (×4 重采样) | 640 | 纠正微调: lr 1e-5, 10ep | **0.236** (Kaggle val) | `output/onnx_v101/crux-hold-seg-v1.0.1-648-fp16.onnx` | **当前默认** |
+
+### realpic GT 评估（IoU≥0.5, 7 张, 333 人工标注）
+
+| 版本 | P | R | F1 | FP | FN |
+|---|---|---|---|---|---|
+| v0.3.0 | 0.71 | 1.00 | 0.83 | 137 | 1 |
+| v1.0.0 (混合) | 0.74 | 0.91 | 0.82 | 108 | 29 |
+| **v1.0.1 (纠正)** | **0.83** | **0.97** | **0.89** | **68** | 10 |
+
+v1.0.1 = realpic 重采样 ×4 + lr 1e-5 + 10 epochs 从 v0.3.0 微调。**纠正式增量 > 混合训练**（用户标注是纠错信号，不是平等样本）。
 
 ## 训练 checkpoint 对应
 
