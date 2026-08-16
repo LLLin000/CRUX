@@ -2,6 +2,7 @@
 // SwiftData container wired at launch; screens under app/Sources/CRUX.
 
 import SwiftUI
+import CRUXClient
 import SwiftData
 
 @main

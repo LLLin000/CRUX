@@ -28,7 +28,8 @@ targets.insert(
             "CRUXCore",
             .product(name: "onnxruntime", package: "onnxruntime-swift-package-manager"),
         ],
-        path: "Sources/CRUX"
+        path: "Sources/CRUX",
+        sources: ["ONNXHoldSegmenter.swift"]
     ),
     at: 0
 )
