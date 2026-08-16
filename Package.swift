@@ -29,7 +29,7 @@ targets.insert(
             .product(name: "onnxruntime", package: "onnxruntime-swift-package-manager"),
         ],
         path: "Sources/CRUX",
-        sources: ["ONNXHoldSegmenter.swift"]
+        sources: ["ONNXHoldSegmenter.swift", "RouteAnalysisCoordinator.swift"]
     ),
     at: 0
 )
