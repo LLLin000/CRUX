@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		1B0000000000000000000001 /* CRUXApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000011 /* CRUXApp.swift */; };
 		1B0000000000000000000002 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000012 /* Models.swift */; };
-		1B0000000000000000000003 /* ColorMath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000013 /* ColorMath.swift */; };
-		1B0000000000000000000004 /* RouteSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000014 /* RouteSelector.swift */; };
 		1B0000000000000000000005 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000015 /* Theme.swift */; };
 		1B0000000000000000000006 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000016 /* RootTabView.swift */; };
 		1B0000000000000000000007 /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000017 /* TodayView.swift */; };
@@ -18,13 +16,12 @@
 		1B0000000000000000000009 /* AddRecordFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000000000000000000019 /* AddRecordFlow.swift */; };
 		1B000000000000000000000A /* PhotoCanonicalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000000000000000000001E /* PhotoCanonicalizer.swift */; };
 		1B000000000000000000000B /* RouteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000000000000000000001F /* RouteDetailView.swift */; };
+		207940EB8A5A25C01A7AB971 /* CRUXCore in Frameworks */ = {isa = PBXBuildFile; productRef = 23D64598A1F95B07F42CF254 /* CRUXCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1A0000000000000000000011 /* CRUXApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRUXApp.swift; sourceTree = "<group>"; };
 		1A0000000000000000000012 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
-		1A0000000000000000000013 /* ColorMath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorMath.swift; sourceTree = "<group>"; };
-		1A0000000000000000000014 /* RouteSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteSelector.swift; sourceTree = "<group>"; };
 		1A0000000000000000000015 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		1A0000000000000000000016 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
 		1A0000000000000000000017 /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
@@ -41,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				207940EB8A5A25C01A7AB971 /* CRUXCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,7 +67,6 @@
 			isa = PBXGroup;
 			children = (
 				1A000000000000000000001D /* AppSources */,
-				1A000000000000000000001C /* CRUXCore */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -87,15 +84,6 @@
 				1A000000000000000000001F /* RouteDetailView.swift */,
 			);
 			path = CRUX;
-			sourceTree = "<group>";
-		};
-		1A000000000000000000001C /* CRUXCore */ = {
-			isa = PBXGroup;
-			children = (
-				1A0000000000000000000013 /* ColorMath.swift */,
-				1A0000000000000000000014 /* RouteSelector.swift */,
-			);
-			path = CRUXCore;
 			sourceTree = "<group>";
 		};
 		1A0000000000000000000008 /* CRUX */ = {
@@ -130,6 +118,9 @@
 			);
 			dependencies = (
 			);
+			packageProductDependencies = (
+				23D64598A1F95B07F42CF254 /* CRUXCore */,
+			);
 			name = CRUX;
 			productName = CRUX;
 			productReference = 1A000000000000000000001B /* CRUX.app */;
@@ -158,6 +149,9 @@
 				en,
 				Base,
 			);
+			packageReferences = (
+				EAD944E593E1C220A10CE268 /* XCLocalSwiftPackageReference ".." */,
+			);
 			mainGroup = 1A0000000000000000000007;
 			productRefGroup = 1A000000000000000000000A /* Products */;
 			projectDirPath = "";
@@ -185,8 +179,6 @@
 			files = (
 				1B0000000000000000000001 /* CRUXApp.swift in Sources */,
 				1B0000000000000000000002 /* Models.swift in Sources */,
-				1B0000000000000000000003 /* ColorMath.swift in Sources */,
-				1B0000000000000000000004 /* RouteSelector.swift in Sources */,
 				1B0000000000000000000005 /* Theme.swift in Sources */,
 				1B0000000000000000000006 /* RootTabView.swift in Sources */,
 				1B0000000000000000000007 /* TodayView.swift in Sources */,
@@ -315,6 +307,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+/* Begin XCLocalSwiftPackageReference section */
+		EAD944E593E1C220A10CE268 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		23D64598A1F95B07F42CF254 /* CRUXCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = EAD944E593E1C220A10CE268 /* XCLocalSwiftPackageReference ".." */;
+			productName = CRUXCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1A0000000000000000000001 /* Project object */;
 }
