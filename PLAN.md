@@ -53,8 +53,8 @@
 
 | 框架 | 许可 | 实例分割性能（COCO mask AP） | iOS 导出 | verdict |
 |---|---|---|---|---|
-| **RF-DETR-Seg**（roboflow） | Apache-2.0（代码+权重） | Nano 40.3 / S 43.1 / M 45.3 | 官方 Core ML 导出文档验证（experimental 标记）；无 NMS 端到端 | ⭐ 首选 |
-| **RTMDet-Ins**（mmdetection） | Apache-2.0 | tiny 35.4 / s 38.7 / m 42.1 | PyTorch→coremltools 官方路径，head 需 NMS 处理 | 备选（D0.5 失败时） |
+| **RF-DETR-Seg**（roboflow） | Apache-2.0（代码+权重） | Nano 40.3 / S 43.1 / M 45.3 | ONNX 导出 + iOS ONNX Runtime；CoreML EP optional | ⭐ 首选 |
+| **RTMDet-Ins**（mmdetection） | Apache-2.0 | tiny 35.4 / s 38.7 / m 42.1 | ONNX/PyTorch adapter 需独立 decode | 备选（D0.5 失败时） |
 | SparseInst（mmdet projects/） | Apache-2.0 | R-50 33.6 / vd-DCN 37.4 | 无 NMS 全卷积，导出需原型 | 备选 |
 | Mask-RT-DETR-S（PaddleDetection） | Apache-2.0 | 41.0（box 46.1） | coremltools v8 已移除 ONNX 前端，导出链断 | 排除 |
 | YOLOv6-Seg / PaddleYOLO | GPL-3.0 | 44.8 / — | GPL 分发受限 | 排除 |
@@ -68,24 +68,94 @@
 ## 3. 系统架构
 
 ```
-SwiftUI / SwiftData
+SwiftUI screens
+        ↓ 只传 command / DTO
+Feature coordinators（只编排，不拥有领域数据）
+        ├─ Today / Calendar
+        ├─ Route Archive / Gym / Map
+        ├─ Add Record
+        ├─ Route Detail
+        └─ Settings / Profile
         ↓
-AddRoute Feature（拍照 → 分割 → 取色 → 选路 → 渲染 → 保存）
-        ↓
-HoldSegmenter（协议）
-  ├─ RFDETRSegmenter        ← 首选实现（Core ML .mlpackage，FP16）
-  └─ RTMDetSegmenter        ← future fallback（D0.5 Gate A/B/C 未通过时）
-        ↓
-HoldColorAnalyzer（mask 内 Lab median，每 hold: maskRLE/bbox/centroid/confidence/color）
-        ↓
-SeededRouteSelector（seed → ΔE00 同色候选 → 空间分组 → 默认含 seed 的 group）
-        ↓
-Manual Correction（点错移除 / 点遗漏加入 / 长按补岩点 / 长按设 START·FINISH）
-        ↓
-RouteRenderer（压暗背景 + 发光 mask + route spine；Glow only / Glow+line）
-        ↓
-SwiftData + canonical sRGB 原图 + 持久化 masks（v1 schema 即含）
+On-device domain modules（互不越权）
+        ├─ Capture      → CanonicalImage
+        ├─ Analysis     → RouteAnalysis / RouteDraft
+        ├─ RouteStore   → ClimbRoute / Hold / RouteUnionMask
+        ├─ RouteQuery   → screen projections（只读）
+        └─ Renderer     → preview image（纯函数）
 ```
+
+### 3.1 Prototype 分区与后端模块归属
+
+| Prototype 区域 | 后端模块 | 唯一职责 | 明确不负责 |
+|---|---|---|---|
+| 今天 / 日历 | `TodayQuery` | 从已保存路线生成月历、次数、岩馆数量摘要 | 不推理、不写路线、不维护 Gym |
+| 路线图鉴 / 筛选 | `RouteQuery` | 返回路线卡片、筛选、排序 | 不改模型结果、不保存照片 |
+| 地图 / 岩馆详情 | `GymQuery` | 按 `gymNameSnapshot + 经纬度` 聚合路线 | 不创建 Gym entity、不拥有路线 |
+| 添加路线照片 | `Capture` | 相机/相册输入、EXIF 修正、sRGB、canonical JPEG | 不解码模型、不写 SwiftData |
+| 添加路线表单 | `RouteMetadata` | 日期、岩馆 snapshot、等级、结果、尝试、用时、备注 | 不负责分割、不直接操作模型 session |
+| 路线识别 / 高亮 | `Analysis` | segmentation、Lab、seed selection、manual correction | 不依赖 SwiftData、不知道 SwiftUI |
+| 路线详情 / 渲染 | `Renderer` | 读取 `RouteSnapshot`，生成 Glow / Glow+line 预览 | 不持久化、不重新推理 |
+| 设置 / 个人档案 | `Preferences` | 用户偏好、展示选项、默认值 | 不修改历史路线、不参与识别算法 |
+| 保存 / 编辑 / 删除 | `RouteStore` | 唯一允许写 `ClimbRoute`、`Hold`、`RouteUnionMask` 的模块 | 不包含 ONNX、Lab、布局或导航逻辑 |
+
+`AddRecordFlow` 是 coordinator：只按顺序调用 `Capture → Analysis → RouteMetadata → RouteStore`，
+不把这四块重新实现一遍。`RouteDetailView` 默认只读；点击编辑时重新进入
+`Analysis` 的 draft，不在 View 内直接修改 SwiftData。
+
+### 3.2 M2 后端接口设计（冻结）
+
+**模块位置**
+
+- `CRUXCore` 只放 DTO、协议、颜色/路线纯逻辑；不得依赖 SwiftUI、SwiftData、UIKit 或 ONNX Runtime。
+- `CRUXClient` 提供 `ONNXHoldSegmenter` adapter；模型加载、tensor 名称、输出解码和 execution provider 只存在这里。
+- UI 只依赖 `RouteAnalysis`、`RouteDraft` 和 `RouteSnapshot`，不读取 ONNX 输出。
+
+**外部接口**
+
+```swift
+public protocol HoldSegmenter: Sendable {
+    var modelVersion: String { get }
+    var inputSize: Int { get }
+    func segment(_ image: CanonicalImage) async throws -> SegmentationResult
+}
+
+public struct SegmentationResult: Sendable {
+    public let modelVersion: String
+    public let inputSize: Int
+    public let detections: [DetectedHold]
+}
+
+public struct DetectedHold: Sendable, Identifiable {
+    public let id: Int                 // stable only within one analysis
+    public let kind: HoldKind          // hold | volume
+    public let confidence: Float
+    public let geometry: HoldGeometry
+}
+```
+
+**坐标与数据不变量**
+
+1. 输入已经 `fixOrientation`、转 sRGB，并保存为 canonical JPEG；宽高随请求传入。
+2. 模型内部可 stretch/resize 到方形输入，但输出必须 inverse-transform 回原图 canonical normalized `[0,1]`。
+3. `HoldGeometry` 的 bbox 是 canonical normalized；mask 是 bbox-local COCO RLE，宽高显式保存，RLE 从零段开始、`Int32 little-endian`。
+4. decoder 在返回前把 mask clip 到自己的 bbox；UI 不再做 mask 修补。
+5. Lab 只从 canonical sRGB 原图 mask 内取样；模型不预测颜色。
+6. `DetectedHold.id` 只在一次 `SegmentationResult` 内稳定；保存为 SwiftData `Hold` 后由模型对象关系负责持久身份。
+
+**错误、生命周期与测试缝**
+
+- `ONNXHoldSegmenter` 加载一次并复用 session；禁止每张照片重新创建 session。
+- 错误使用 typed failures：model unavailable、invalid image、invalid output、inference failed；不返回空结果伪装成功。
+- `SegmentationResult` 不保存 logits、tensor 或 provider 细节，只保存后续分析和 provenance 所需结果。
+- 测试通过 `FakeHoldSegmenter` 注入固定结果；Core 测试不链接 ONNX Runtime。
+
+**唯一数据流**
+
+`Capture → ONNXHoldSegmenter → HoldColorAnalyzer → SeededRouteSelector → RouteDraft
+→ RouteStore`。
+Today、Archive、Gym、Map、Renderer 都只能从 `RouteStore` 读取 projection；
+它们不能反向调用 Analysis。
 
 ## 4. 坐标系与图片变换（architecture invariant）
 
@@ -171,8 +241,8 @@ SwiftUI 渲染：canonical sRGB image + scaledToFit；touch 坐标 → 逆变换
 
 ```
 拍照/相册 → fixOrientation + 转 sRGB → canonical sRGB image（保存）
-  → RF-DETR-Seg（Core ML .mlpackage，FP16，recall 优先阈值）
-      [inference transform 仅在分割器内部，入库前 inverseTransform]
+  → RF-DETR-Seg（ONNX + iOS ONNX Runtime，FP16/INT8，recall 优先阈值）
+      [inference transform 仅在 adapter 内部，入库前 inverseTransform]
   → 每 hold: maskRLE(bbox-local) + bbox + centroid + Lab median
   → 用户点任一岩点（seed）
   → ΔE00 匹配全图同色候选（阈值 heuristic）
@@ -199,7 +269,7 @@ SwiftUI 渲染：canonical sRGB image + scaledToFit；touch 坐标 → 逆变换
 |---|---|---|
 | **M0**（第 1 周） | Xcode 工程 + 设计 token + **底部 2 主入口（今日\|图鉴）+ 独立 ＋** + 二级导航（设置）+ SwiftData schema v1 | 2 主 tab 可切、Add flow 可开可关、二级导航完整返回、schema v1 编译通过（含 maskRLE/maskWidth/maskHeight/provenance 字段） |
 | **M1**（第 2-3 周） | 加记录全流程（相机/相册→fixOrientation+sRGB→表单：gym 地图选 POI→保存）+ 路线详情**伪分割渲染**（演示照片手摆 maskRLE 写入 schema + 发光 + route spine）+ 日历/图鉴列表 | 完整走通"拍照→保存→图鉴→详情"；渲染效果对齐 prototype；点选对齐（canonical 规则）用真机照片验证 |
-| **M2**（第 4-5 周） | 接入真模型（Core ML 加载/推理 + inverseTransform → maskRLE/Lab/seed 点选交互）+ Manual Correction 完整交互（含补岩点/START·FINISH）+ 岩馆聚合页 | 真实照片可分割、seed 点选高亮、±修正、补岩点、修正计数落库；**端到端延迟达标（§7 D2）** |
+| **M2**（第 4-5 周） | 后端：`HoldSegmenter` + ONNX Runtime adapter + inverseTransform/decode；前端只消费 `RouteAnalysis` 完成 seed 点选、±修正、补岩点、START·FINISH；另加岩馆聚合页 | 真实照片可分割；UI 不感知 tensor/provider；修正计数落库；**端到端延迟达标（§7 D2）** |
 | **M3**（第 6 周） | 打磨：空态、动画、性能、无障碍、真机回归 | 日常可用，TestFlight 打包 |
 
 ### Track B — 数据与模型
@@ -209,7 +279,7 @@ SwiftUI 渲染：canonical sRGB image + scaledToFit；touch 坐标 → 逆变换
 | **D0**（第 1 周） | **两套标注规范**：① 训练标注 `instance_id, class=hold\|volume, polygon`（COCO 格式）；② benchmark 标注 `instance_id, route_id, route_color, is_start, is_finish`。Kaggle 数据转 COCO 脚本 | 规范文档 + 转换脚本跑通，样本可视化 |
 | **D0.5**（第 1-2 周，关键 spike） | **RF-DETR-Seg 链路验证，只 gate runtime/export（v1.3：ONNX 路线）**：10-20 张小数据微调（research weights）→ **ONNX 导出（Windows 可做）** → iPhone 真机（onnxruntime） | **Gate A**：PyTorch→ONNX 完整导出 + 推理数值一致性（Windows 端 torch 对比）；**Gate B**：输出正确（mask shape/bbox 正确、无 crash、数值无异常）；**Gate C**：384/432/512 三档 p50/p95/peak memory（真机）。**只有 A/B/C runtime 问题才触发切 RTMDet**；hold recall 不足归 D1/D2 |
 | **D1**（第 2-3 周） | 数据收集：**自有实拍（production）** + Kaggle（research，仅调参）+ climbnet 预标注 + 人工修正；**建立 RouteBenchmark**（100-200 条真实路线、跨多岩馆） | production：**≥100 images AND ≥1000 instances**（初始目标，不死板）；统计 gym/wall/lighting/device diversity；验证集**按岩馆隔离**；RouteBenchmark 完成 |
-| **D2**（第 4 周） | 正式训练 RF-DETR-Seg-S/M（production weights）+ Core ML 导出 FP16 + 真机基准 + RouteBenchmark 评测（双层，见下） | **产品 KPI 达标** |
+| **D2**（第 4 周） | 正式训练 RF-DETR-Seg-S/M（production weights）+ ONNX Runtime-compatible FP16/INT8 export + 真机基准 + RouteBenchmark 评测（双层，见下） | **产品 KPI 达标** |
 | **D3**（第 5 周） | 错误案例分析 + 补标迭代 + 模型版本迭代 | 集成 M2；**用 provenance 数据验证新模型把平均修正数降下来** |
 
 **D2 验收指标（产品 KPI，双层 benchmark）**。不写含糊的"mask mAP ≥ 0.8"（RF-DETR-Seg-S 官方 COCO AP50:95 仅 43.1）。阈值在 D0.5/D1 baseline 后冻结：
@@ -253,6 +323,6 @@ KPI 清单：
 
 ## 10. 参考仓库
 
-- 模型：**roboflow/rf-detr**（RF-DETR-Seg，Apache-2.0；Core ML 导出 cookbook：rfdetr.roboflow.com）、open-mmlab/mmdetection（RTMDet-Ins/SparseInst 备选）、cydivision/climbnet（预标注权重，Apache）、xiaoxiae Kaggle 数据集（research only）、mkurc1/climbingcrux_model（同类验证）
+- 模型：**roboflow/rf-detr**（RF-DETR-Seg，Apache-2.0；ONNX export + iOS ONNX Runtime）、open-mmlab/mmdetection（RTMDet-Ins/SparseInst 备选）、cydivision/climbnet（预标注权重，Apache）、xiaoxiae Kaggle 数据集（research only）、mkurc1/climbingcrux_model（同类验证）
 - UI：luisarmada/climbfolio（日历/图鉴/会话流）、masonmill/climbinglog（SwiftUI）、IanTimchak/spraywalls（Board/Hold/Route 数据模型）、pointfreeco/syncups（状态驱动导航）、konotori/RecipeBox（SwiftData 蓝本）
 - 算法：tillwf/climbing-holds-pathway-extractor（HSV 区间）、xiaoxiae std/（KMeans）、NeuralClimb（HLS mode 取色）
