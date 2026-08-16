@@ -48,6 +48,7 @@ v1.0.1 = `crux-dataset-v101` 中 realpic 重采样 ×4 + lr 1e-5 + 10 epochs
 
 ## 已知限制
 
+- `CRUX/Models/crux-hold-seg-v1.0.1-648-int8.onnx` 是 M2 dev 垂直切片随 App bundle 的开发副本（FP16 132MB 超 GitHub 100MB/文件上限不能入库；INT8 static 是部署候选）。Distribution 仍为 **no**；production 分发需通过端侧 parity/recall/correction-count Gate 或换 D2 production 权重。
 - 数据仍不足以代表独立 production 泛化；v1.0.1 的 7 张 realpic 同时参与 correction fine-tuning。
 - production-distributable 模型必须使用自有或明确授权数据，并建立独立 `realpic_test`。
 - v1.0.1 的 static INT8 仅为部署候选；FP16 是 accuracy reference，需经过端侧 parity、recall 和 correction-count Gate。
