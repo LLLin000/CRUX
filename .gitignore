@@ -12,3 +12,7 @@ __pycache__/
 
 # swift
 .build/
+
+# local agent index and Label Studio debug output
+.codebase-memory/
+.scratch/ls_*

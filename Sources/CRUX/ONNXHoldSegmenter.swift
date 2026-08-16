@@ -167,20 +167,21 @@ public actor ONNXHoldSegmenter: HoldSegmenter {
             let y2 = max(0, min(1, centerY + rawHeight / 2))
             guard x2 > x1, y2 > y1 else { continue }
 
-            let maskWidth = max(1, min(128, Int(((x2 - x1) * Double(imageWidth)).rounded())))
-            let maskHeight = max(1, min(128, Int(((y2 - y1) * Double(imageHeight)).rounded())))
             let maskOffset = query * maskSize * maskSize
-            let maskRLE = encodeMask(
+            guard let rasterized = MaskRasterizer.rasterize(
                 logits: masks,
                 offset: maskOffset,
                 maskSize: maskSize,
+                inputSize: inputSize,
+                imageWidth: imageWidth,
+                imageHeight: imageHeight,
                 bboxX: x1,
                 bboxY: y1,
                 bboxWidth: x2 - x1,
-                bboxHeight: y2 - y1,
-                width: maskWidth,
-                height: maskHeight
-            )
+                bboxHeight: y2 - y1
+            ) else {
+                continue
+            }
             detections.append(
                 DetectedHold(
                     id: query,
@@ -191,9 +192,9 @@ public actor ONNXHoldSegmenter: HoldSegmenter {
                         bboxY: y1,
                         bboxWidth: x2 - x1,
                         bboxHeight: y2 - y1,
-                        maskWidth: maskWidth,
-                        maskHeight: maskHeight,
-                        maskRLE: maskRLE
+                        maskWidth: rasterized.width,
+                        maskHeight: rasterized.height,
+                        maskRLE: rasterized.rle
                     )
                 )
             )
@@ -214,45 +215,6 @@ public actor ONNXHoldSegmenter: HoldSegmenter {
         }
     }
 
-    private static func sigmoid(_ value: Float) -> Double {
-        let clamped = max(-60, min(60, Double(value)))
-        return 1 / (1 + exp(-clamped))
-    }
 
-    private static func encodeMask(
-        logits: [Float],
-        offset: Int,
-        maskSize: Int,
-        bboxX: Double,
-        bboxY: Double,
-        bboxWidth: Double,
-        bboxHeight: Double,
-        width: Int,
-        height: Int
-    ) -> Data {
-        var counts: [Int32] = []
-        var currentValue = false
-        var runLength: Int32 = 0
-
-        for y in 0..<height {
-            let normalizedY = bboxY + (Double(y) + 0.5) / Double(height) * bboxHeight
-            let maskY = min(maskSize - 1, max(0, Int(normalizedY * Double(maskSize))))
-            for x in 0..<width {
-                let normalizedX = bboxX + (Double(x) + 0.5) / Double(width) * bboxWidth
-                let maskX = min(maskSize - 1, max(0, Int(normalizedX * Double(maskSize))))
-                let logit = logits[offset + maskY * maskSize + maskX]
-                let value = sigmoid(logit) >= 0.5
-                if value == currentValue {
-                    runLength += 1
-                } else {
-                    counts.append(runLength)
-                    currentValue = value
-                    runLength = 1
-                }
-            }
-        }
-        counts.append(runLength)
-        return counts.withUnsafeBytes { Data($0) }
-    }
 }
 #endif

@@ -178,12 +178,24 @@ public struct RouteAnalysis: Sendable, Equatable {
     }
 }
 
+public enum RouteHoldID {
+    public static func manual(_ ordinal: Int) -> Int {
+        precondition(ordinal >= 0)
+        return -(ordinal + 1)
+    }
+
+    public static func isManual(_ id: Int) -> Bool {
+        id < 0
+    }
+}
+
 public struct ManualHold: Sendable, Equatable, Identifiable {
     public let id: Int
     public let geometry: HoldGeometry
     public let referenceLab: LabColor
 
     public init(id: Int, geometry: HoldGeometry, referenceLab: LabColor) {
+        precondition(RouteHoldID.isManual(id))
         self.id = id
         self.geometry = geometry
         self.referenceLab = referenceLab
@@ -207,12 +219,16 @@ public struct RouteDraft: Sendable, Equatable {
         startHoldID: Int? = nil,
         finishHoldID: Int? = nil
     ) {
+        let detectedIDs = Set(analysis.holds.map(\.id))
+        let initialIDs = initialSelectedHoldIDs.intersection(detectedIDs)
+        let selectedIDs = selectedHoldIDs.intersection(detectedIDs)
+        let currentIDs = selectedIDs.union(manualAdditions.map(\.id))
         self.analysis = analysis
-        self.initialSelectedHoldIDs = initialSelectedHoldIDs
-        self.selectedHoldIDs = selectedHoldIDs
+        self.initialSelectedHoldIDs = initialIDs
+        self.selectedHoldIDs = selectedIDs
         self.manualAdditions = manualAdditions
-        self.startHoldID = startHoldID
-        self.finishHoldID = finishHoldID
+        self.startHoldID = startHoldID.flatMap { currentIDs.contains($0) ? $0 : nil }
+        self.finishHoldID = finishHoldID.flatMap { currentIDs.contains($0) ? $0 : nil }
     }
 
     public var manualAddedDetectedHoldIDs: Set<Int> {
@@ -227,6 +243,10 @@ public struct RouteDraft: Sendable, Equatable {
         manualAddedDetectedHoldIDs.count
             + manualRemovedDetectedHoldIDs.count
             + manualAdditions.count
+    }
+
+    public var currentRouteHoldIDs: Set<Int> {
+        selectedHoldIDs.union(manualAdditions.map(\.id))
     }
 
     public func selecting(seedIndex: Int, selector: SeededRouteSelector = .init()) -> RouteDraft {
@@ -312,8 +332,7 @@ public struct RouteDraft: Sendable, Equatable {
     }
 
     private func containsHold(_ id: Int) -> Bool {
-        analysis.holds.contains(where: { $0.id == id })
-            || manualAdditions.contains(where: { $0.id == id })
+        currentRouteHoldIDs.contains(id)
     }
 }
 
